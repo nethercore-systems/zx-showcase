@@ -181,6 +181,9 @@ pub fn spawn_boss(boss_type: EnemyType) {
             }
             ENEMIES[i].max_health = ENEMIES[i].health;
             ACTIVE_BOSS = Some(i);
+
+            // Spawn dramatic boss intro VFX
+            spawn_boss_intro(ENEMIES[i].x, ENEMIES[i].y, boss_type);
         }
     }
 }
@@ -276,6 +279,47 @@ pub fn spawn_enemy_death(x: f32, y: f32, color: u32) {
 pub fn spawn_level_up_vfx(x: f32, y: f32, owner: u8) {
     let colors: [u32; 4] = [0xFFD700FF, 0xFFD700FF, 0xFFD700FF, 0xFFD700FF];
     spawn_vfx(VfxType::LevelUp, x, y, 0.0, 2.0, 1.0, colors[owner as usize % 4], 0.0, owner);
+}
+
+/// Spawn combo milestone celebration effect
+/// tier: 0 = 5 kills (green), 1 = 10 kills (orange), 2 = 25 kills (gold), 3 = 50+ kills (purple)
+pub fn spawn_combo_celebration(tier: u8) {
+    unsafe {
+        let color = match tier {
+            0 => 0x44FF44FF,  // Green
+            1 => 0xFF8844FF,  // Orange
+            2 => 0xFFD700FF,  // Gold
+            _ => 0xFF00FFFF,  // Purple (legendary)
+        };
+        let scale = 1.0 + tier as f32 * 0.5;
+
+        // Spawn multiple particle bursts around the screen center
+        for i in 0..4 {
+            let angle = (i as f32 * 90.0) * 0.0175;
+            let ox = cos(angle) * 2.0;
+            let oy = sin(angle) * 2.0;
+            // Use average player position for combo effect
+            let mut px = 0.0f32; let mut py = 0.0f32; let mut cnt = 0;
+            for p in &PLAYERS { if p.active && !p.dead { px += p.x; py += p.y; cnt += 1; } }
+            if cnt > 0 { px /= cnt as f32; py /= cnt as f32; }
+            spawn_vfx(VfxType::ComboMilestone, px + ox, py + oy, 0.0, scale, 0.6, color, tier as f32, 0);
+        }
+    }
+}
+
+/// Spawn Divine Crush ground slam effect
+pub fn spawn_divine_crush_vfx(x: f32, y: f32, range: f32, owner: u8) {
+    spawn_vfx(VfxType::DivineCrush, x, y, 0.0, range, 0.4, 0xFFDD44FF, 0.0, owner);
+}
+
+/// Spawn boss intro dramatic effect
+pub fn spawn_boss_intro(x: f32, y: f32, boss_type: EnemyType) {
+    let color = match boss_type {
+        EnemyType::PrismColossus => 0xFF88FFFF,  // Pink/prismatic
+        EnemyType::VoidDragon => 0x8800FFFF,     // Dark purple
+        _ => 0xFF4444FF,
+    };
+    spawn_vfx(VfxType::BossIntro, x, y, 0.0, 4.0, 2.0, color, 0.0, 0);
 }
 
 pub fn update_vfx(dt: f32) {

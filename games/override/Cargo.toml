@@ -5,6 +5,9 @@ edition = "2021"
 description = "Asymmetric 1v3 multiplayer - Overseer vs Runners"
 authors = ["Nethercore"]
 
+# Standalone workspace (games build to wasm32-unknown-unknown)
+[workspace]
+
 [lib]
 crate-type = ["cdylib"]
 

@@ -196,12 +196,22 @@ pub fn fire_weapons(player_idx: usize) {
                         // DivineBolt synergy: chain to nearby enemies
                         let range = 2.5 + pu.level as f32 * 0.3;
 
+                        // Spawn visual effect for the ground slam
+                        spawn_divine_crush_vfx(p.x, p.y, range, player_idx as u8);
+
                         // Primary smash
                         for e in &mut ENEMIES {
                             if e.active && dist(p.x, p.y, e.x, e.y) < range {
                                 e.health -= dmg * 1.2; e.hit_timer = 0.3; // Longer stun
                                 play_sound(SFX_HIT, 0.3, 0.0);
-                                if e.health <= 0.0 { e.active = false; KILLS += 1; spawn_xp(e.x, e.y, 3); }
+
+                                // Spawn damage number for each hit
+                                spawn_damage_number(e.x, e.y, dmg * 1.2, true);
+
+                                if e.health <= 0.0 {
+                                    spawn_enemy_death(e.x, e.y, 0xFFDD44FF);
+                                    e.active = false; KILLS += 1; spawn_xp(e.x, e.y, 3);
+                                }
                             }
                         }
 
@@ -210,6 +220,7 @@ pub fn fire_weapons(player_idx: usize) {
                             for e in &mut ENEMIES {
                                 if e.active && dist(p.x, p.y, e.x, e.y) < range + 3.0 && dist(p.x, p.y, e.x, e.y) >= range {
                                     e.health -= dmg * 0.5; e.hit_timer = 0.1;
+                                    spawn_hit_spark(e.x, e.y, 0x88AAFFFF);  // Lightning spark
                                     if e.health <= 0.0 { e.active = false; KILLS += 1; spawn_xp(e.x, e.y, 2); }
                                 }
                             }

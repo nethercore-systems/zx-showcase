@@ -1,9 +1,9 @@
 # Project Status: Lumina Depths
 
-**Last updated:** 2025-12-29
+**Last updated:** 2025-12-30
 
 ## Phase
-**Current:** Asset Generation (69% meshes, 17% audio complete)
+**Current:** Asset Generation (73% meshes, 17% audio complete)
 
 ## Foundation (Complete)
 - [x] Game Design Document (`docs/GDD.md`)
@@ -15,22 +15,19 @@
 
 ## Asset Status
 
-### Meshes: 18/26 complete (69%)
+### Meshes: 19/26 complete (73%)
 
 | Category | Status | Assets |
 |----------|--------|--------|
 | Player | ✅ | submersible (532v) |
 | Epic Encounters | ✅ | blue_whale (1142v), sperm_whale (1164v) |
-| Coral (pre-existing) | ✅ | coral_brain, coral_branching, coral_fan |
-| Bioluminescent (pre-existing) | ✅ | lantern_jelly, void_swimmer, light_eater, abyssal_leviathan |
 | Zone 1: Sunlit Waters | ✅ | reef_fish (188v), sea_turtle (548v), manta_ray (656v), coral_crab (444v) |
 | Zone 2: Twilight Realm | ✅ | moon_jelly (1560v), lanternfish (514v), siphonophore (976v), giant_squid (1390v) |
-| Zone 3: Midnight Abyss | ❌ | anglerfish, gulper_eel, dumbo_octopus, vampire_squid |
-| Zone 4: Hydrothermal Vents | ❌ | tube_worms, vent_shrimp, ghost_fish, vent_octopus |
+| Zone 3: Midnight Abyss | ✅ | anglerfish (1317v), gulper_eel (1061v), dumbo_octopus (1062v), vampire_squid (1963v) |
+| Zone 4: Hydrothermal Vents | ✅ | tube_worms (2886v), vent_shrimp (1242v), ghost_fish (1028v), vent_octopus (1472v) |
 | Epic: Giant Isopod | ❌ | giant_isopod |
-| Flora | ❌ | kelp, anemone, sea_grass (3 remaining) |
+| Flora | ❌ | kelp, anemone, sea_grass |
 | Terrain | ❌ | rock_boulder, rock_pillar, vent_chimney, seafloor_patch |
-| Effects | ❌ | bubble_cluster |
 
 ### Audio: 6/36 complete (17%)
 
@@ -58,9 +55,11 @@
 | **High** | Whale calls | ✅ Complete |
 | **Medium** | Zone 1 creatures | ✅ Complete |
 | **Medium** | Zone 2 creatures | ✅ Complete |
-| **Medium** | Flora meshes | ❌ Pending |
+| **Medium** | Zone 3 creatures | ✅ Complete |
+| **Medium** | Zone 4 creatures | ✅ Complete |
 | **Medium** | Creature proximity sounds | ❌ Pending |
-| **Lower** | Zone 3/4 creatures | ❌ Pending |
+| **Lower** | Giant isopod mesh | ❌ Pending |
+| **Lower** | Flora meshes | ❌ Pending |
 | **Lower** | Terrain meshes | ❌ Pending |
 | **Lower** | Submersible sounds | ❌ Pending |
 | **Lower** | Discovery fanfares | ❌ Pending |
@@ -71,15 +70,15 @@
 
 ```
 assets/
-├── generated/           # Pre-existing procgen assets
-│   ├── coral_*.obj      # 3 coral meshes
-│   └── creature_*.obj   # 4 bioluminescent creatures + emission maps
 ├── models/
-│   ├── meshes/          # New generated meshes (11 files)
+│   ├── meshes/          # Generated meshes (19 files)
+│   │   ├── submersible.obj, blue_whale.obj, sperm_whale.obj
+│   │   ├── reef_fish.obj, sea_turtle.obj, manta_ray.obj, coral_crab.obj
+│   │   ├── moon_jelly.obj, lanternfish.obj, siphonophore.obj, giant_squid.obj
+│   │   ├── anglerfish.obj, gulper_eel.obj, dumbo_octopus.obj, vampire_squid.obj
+│   │   └── tube_worms.obj, vent_shrimp.obj, ghost_fish.obj, vent_octopus.obj
 │   └── textures/        # (empty - pending)
-└── audio/               # Generated sounds (6 files)
-    ├── ambient_*.wav    # 4 zone ambients
-    └── whale*.wav       # 2 whale calls
+└── audio/               # (pending generation)
 ```
 
 ---

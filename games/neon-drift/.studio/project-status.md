@@ -9,7 +9,7 @@ Last updated: 2025-12-30
 - [x] Design Notes (DESIGN_NOTES.md - detailed asset specs)
 
 ## Phase
-**Current:** All Assets Complete - Ready for Build & Testing
+**Current:** Testing & Polish (ROM built, music composition pending)
 
 ## Code Status
 - [x] Racing mechanics: Complete
@@ -79,14 +79,17 @@ Last updated: 2025-12-30
 | Pad | synth_pad.wav | 1.00s |
 | Arp | synth_arp.wav | 0.15s |
 
-### Music Tracks (5/5 Complete)
-| Track | File | BPM | Key | Mood |
-|-------|------|-----|-----|------|
-| Sunset Strip | sunset_strip.xm | 128 | Am | Nostalgic, warm |
-| Neon City | neon_city.xm | 132 | Em | Urban, energetic |
-| Void Tunnel | void_tunnel.xm | 138 | Dm | Mysterious, intense |
-| Crystal Cavern | crystal_cavern.xm | 130 | Bm | Ethereal, tense |
-| Solar Highway | solar_highway.xm | 140 | Fm | Epic, triumphant |
+### Music Tracks (0/5 - Specs Ready, XM Composition Pending)
+| Track | Spec | BPM | Key | Mood | XM File |
+|-------|------|-----|-----|------|---------|
+| Sunset Strip | Ready | 128 | Am | Nostalgic, warm | NOT YET COMPOSED |
+| Neon City | Ready | 132 | Em | Urban, energetic | NOT YET COMPOSED |
+| Void Tunnel | Ready | 138 | Dm | Mysterious, intense | NOT YET COMPOSED |
+| Crystal Cavern | Ready | 130 | Bm | Ethereal, tense | NOT YET COMPOSED |
+| Solar Highway | Ready | 140 | Fm | Epic, triumphant | NOT YET COMPOSED |
+
+**Note:** Synth samples (kick, snare, hihat, etc.) are ready for use as instruments.
+Compose in MilkyTracker or OpenMPT, export as XM format.
 
 ## Recent Changes (2025-12-30)
 1. **Enhanced car generator** - Complete rewrite with improved geometry

@@ -152,20 +152,20 @@ Creatures behave authentically, not as game objects.
 
 # Current Focus
 
-**Updated:** 2025-12-29
+**Updated:** 2025-12-30
 
 ## Completed Assets
-- **Meshes (18/26):** submersible, whales, Zone 1 creatures, Zone 2 creatures, corals, bioluminescent creatures
-- **Audio (6/36):** 4 zone ambients, 2 whale calls
+- **Meshes (19/26):** submersible, whales, Zone 1-4 creatures (all 16 zone creatures complete)
+- **Audio (0/36):** Pending generation
 
 ## In Progress
-- Zone 3/4 creature meshes (anglerfish, gulper_eel, tube_worms, etc.)
+- Giant isopod mesh (epic encounter)
 - Flora meshes (kelp, anemone, sea_grass)
+- Terrain meshes (rock_boulder, rock_pillar, vent_chimney, seafloor_patch)
 
 ## Next Priorities
-1. Zone 3 creatures (Midnight Abyss - bioluminescent deep-sea life)
-2. Zone 4 creatures (Hydrothermal Vents - extremophile life)
-3. Flora and terrain meshes
-4. Creature proximity sounds
-5. Submersible SFX (propeller, hull creaks)
-6. Texture generation for all meshes
+1. Giant isopod (epic encounter)
+2. Flora meshes (3 remaining)
+3. Terrain meshes (4 remaining)
+4. Audio generation (zone ambients, creature sounds, SFX)
+5. Texture generation for all meshes

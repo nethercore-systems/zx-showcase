@@ -491,6 +491,98 @@ pub fn render_vfx() {
                         draw_billboard(scale * 0.15, scale * 0.15, 1, color_with_alpha);
                     }
                 }
+                VfxType::ComboMilestone => {
+                    // Spectacular burst of particles rising and spreading
+                    let tier = v.value as u8;
+                    let particle_count = 4 + tier * 2;
+
+                    for i in 0..particle_count {
+                        let angle = (i as f32 * (360.0 / particle_count as f32) + progress * 180.0) * 0.0175;
+                        let spread = progress * v.scale;
+                        let rise = progress * (2.0 + tier as f32 * 0.5);
+                        let px = v.x + cos(angle) * spread;
+                        let pz = v.y + sin(angle) * spread;
+                        let size = v.scale * 0.2 * (1.0 - progress * 0.5);
+
+                        push_identity();
+                        push_translate(px, 0.5 + rise, pz);
+                        draw_billboard(size, size, 1, color_with_alpha);
+                    }
+                }
+                VfxType::DivineCrush => {
+                    // Radial shockwave expanding outward
+                    let ring_progress = progress.min(1.0);
+                    let ring_scale = v.scale * ring_progress * 2.0;
+
+                    // Inner bright impact
+                    let inner_alpha = ((1.0 - progress) * 200.0) as u32;
+                    push_identity();
+                    push_translate(v.x, 0.1, v.y);
+                    push_scale_uniform(ring_scale * 0.3);
+                    material_shininess(1.0);
+                    material_specular(0xFFFFAAFF);
+                    set_color((v.color & 0xFFFFFF00) | inner_alpha);
+                    draw_mesh(MESH_ARENA);
+
+                    // Outer expanding ring
+                    push_identity();
+                    push_translate(v.x, 0.15, v.y);
+                    push_scale_uniform(ring_scale);
+                    set_color(color_with_alpha);
+                    draw_mesh(MESH_ARENA);
+
+                    // Rising debris particles
+                    for i in 0..6 {
+                        let angle = (i as f32 * 60.0 + progress * 90.0) * 0.0175;
+                        let dist = ring_scale * 0.4;
+                        let rise = progress * 1.5 * (1.0 - progress);
+                        push_identity();
+                        push_translate(v.x + cos(angle) * dist, 0.3 + rise, v.y + sin(angle) * dist);
+                        draw_billboard(0.15, 0.15, 1, color_with_alpha);
+                    }
+                }
+                VfxType::ProjectileTrail => {
+                    // Simple fading trail segment
+                    let size = 0.1 * (1.0 - progress);
+                    push_identity();
+                    push_translate(v.x, 0.4, v.y);
+                    draw_billboard(size, size, 1, color_with_alpha);
+                }
+                VfxType::BossIntro => {
+                    // Dramatic boss entrance with pillar of light and expanding rings
+                    let pulse = (1.0 - progress) * (1.0 + sin(GAME_TIME * 10.0) * 0.3);
+
+                    // Central pillar of light (rising beam)
+                    let beam_height = 8.0 * (1.0 - progress);
+                    push_identity();
+                    push_translate(v.x, beam_height * 0.5, v.y);
+                    let beam_alpha = ((1.0 - progress) * pulse * 180.0) as u32;
+                    draw_billboard(v.scale * 0.3, beam_height, 1, (v.color & 0xFFFFFF00) | beam_alpha);
+
+                    // Expanding rings on ground
+                    for ring in 0..3 {
+                        let ring_delay = ring as f32 * 0.15;
+                        let ring_prog = (progress - ring_delay).max(0.0).min(1.0);
+                        let ring_size = v.scale * ring_prog * (1.0 + ring as f32 * 0.3);
+                        let ring_alpha = ((1.0 - ring_prog) * 150.0) as u32;
+
+                        push_identity();
+                        push_translate(v.x, 0.1 + ring as f32 * 0.05, v.y);
+                        push_scale_uniform(ring_size);
+                        set_color((v.color & 0xFFFFFF00) | ring_alpha);
+                        draw_mesh(MESH_ARENA);
+                    }
+
+                    // Orbiting particles
+                    for i in 0..8 {
+                        let angle = (i as f32 * 45.0 + GAME_TIME * 180.0) * 0.0175;
+                        let orbit_r = v.scale * (0.5 + progress * 0.5);
+                        let height = 1.0 + (1.0 - progress) * 3.0;
+                        push_identity();
+                        push_translate(v.x + cos(angle) * orbit_r, height, v.y + sin(angle) * orbit_r);
+                        draw_billboard(0.2 * pulse, 0.2 * pulse, 1, color_with_alpha);
+                    }
+                }
             }
         }
 

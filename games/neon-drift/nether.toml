@@ -282,27 +282,22 @@ id = "synth_arp"
 path = "assets/audio/synth_arp.wav"
 
 # === MUSIC TRACKS (XM Tracker Format) ===
-# NOTE: Music requires MilkyTracker/OpenMPT to create valid XM files.
-# These entries are commented out until XM files are composed.
-# The synth samples above (synth_kick, synth_snare, etc.) are ready
-# for use as instruments when composing in a tracker.
-#
-# [[assets.trackers]]
-# id = "sunset_strip"
-# path = "assets/audio/music/sunset_strip.xm"
-#
-# [[assets.trackers]]
-# id = "neon_city"
-# path = "assets/audio/music/neon_city.xm"
-#
-# [[assets.trackers]]
-# id = "void_tunnel"
-# path = "assets/audio/music/void_tunnel.xm"
-#
-# [[assets.trackers]]
-# id = "crystal_cavern"
-# path = "assets/audio/music/crystal_cavern.xm"
-#
-# [[assets.trackers]]
-# id = "solar_highway"
-# path = "assets/audio/music/solar_highway.xm"
+[[assets.trackers]]
+id = "sunset_strip"
+path = "assets/audio/music/sunset_strip.xm"
+
+[[assets.trackers]]
+id = "neon_city"
+path = "assets/audio/music/neon_city.xm"
+
+[[assets.trackers]]
+id = "void_tunnel"
+path = "assets/audio/music/void_tunnel.xm"
+
+[[assets.trackers]]
+id = "crystal_cavern"
+path = "assets/audio/music/crystal_cavern.xm"
+
+[[assets.trackers]]
+id = "solar_highway"
+path = "assets/audio/music/solar_highway.xm"

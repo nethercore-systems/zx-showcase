@@ -352,6 +352,10 @@ pub enum VfxType {
     PlayerHurt = 5,      // Screen flash when player hurt
     LevelUp = 6,         // Level up celebration
     EnemyDeath = 7,      // Enemy death burst
+    ComboMilestone = 8,  // Combo tier celebration (5, 10, 25, 50 kills)
+    DivineCrush = 9,     // Paladin ground slam
+    ProjectileTrail = 10, // Trail behind projectiles
+    BossIntro = 11,      // Boss spawn dramatic entrance
 }
 
 #[derive(Clone, Copy)]

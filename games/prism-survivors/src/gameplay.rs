@@ -301,11 +301,23 @@ pub fn update_projectiles() {
                         e.active = false; KILLS += 1;
 
                         // Combo system - extend timer and increase count
+                        let prev_combo = COMBO_COUNT;
                         COMBO_COUNT += 1;
                         COMBO_TIMER = COMBO_WINDOW + (COMBO_COUNT as f32 * COMBO_DECAY).min(3.0);
                         if COMBO_COUNT > MAX_COMBO { MAX_COMBO = COMBO_COUNT; }
                         // Combo multiplier: 1.0 base, +10% per 5 kills, capped at 2.5x
                         COMBO_MULT = (1.0 + (COMBO_COUNT / 5) as f32 * 0.1).min(2.5);
+
+                        // Combo milestone celebrations with VFX and SFX
+                        if prev_combo < 5 && COMBO_COUNT >= 5 {
+                            spawn_combo_celebration(0);  // Green tier
+                        } else if prev_combo < 10 && COMBO_COUNT >= 10 {
+                            spawn_combo_celebration(1);  // Orange tier
+                        } else if prev_combo < 25 && COMBO_COUNT >= 25 {
+                            spawn_combo_celebration(2);  // Gold tier
+                        } else if prev_combo < 50 && COMBO_COUNT >= 50 {
+                            spawn_combo_celebration(3);  // Purple/Legendary tier
+                        }
 
                         let xp_val = match e.enemy_type {
                             // Basic enemies

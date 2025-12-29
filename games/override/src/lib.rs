@@ -10,6 +10,10 @@
 mod ffi;
 use ffi::*;
 
+// Camera system for dual-perspective rendering
+mod camera;
+use camera::{CameraState, setup_runner_camera, setup_overseer_camera, get_local_role};
+
 // AI module for single-player mode
 mod ai;
 use ai::{RunnerAI, RunnerInput, update_runner_ai};
@@ -368,7 +372,18 @@ impl GameState {
 // ============================================================================
 
 struct Assets {
-    // Tilesets
+    // 3D Meshes (procedural, created in init)
+    mesh_floor: u32,      // Flat plane for floor tiles
+    mesh_wall: u32,       // Cube for walls
+    mesh_door: u32,       // Thin cube for doors
+    mesh_runner: u32,     // Capsule for runner (placeholder)
+    mesh_drone: u32,      // Sphere for drone (placeholder)
+    mesh_core: u32,       // Cube for data core (placeholder)
+    mesh_trap_spike: u32, // Cylinder for spike trap
+    mesh_trap_gas: u32,   // Flat plane for gas trap
+    mesh_trap_laser: u32, // Thin cube for laser trap
+
+    // Tilesets (textures for 3D meshes)
     floor_metal: u32,
     floor_grate: u32,
     floor_panel: u32,
@@ -380,7 +395,7 @@ struct Assets {
     wall_screen: u32,
     wall_doorframe: u32,
 
-    // Sprites
+    // Sprites (still used for UI and some effects)
     door_closed: u32,
     door_open: u32,
     door_locked: u32,
@@ -426,6 +441,17 @@ struct Assets {
 impl Assets {
     const fn new() -> Self {
         Self {
+            // Meshes (initialized to 0, created in init)
+            mesh_floor: 0,
+            mesh_wall: 0,
+            mesh_door: 0,
+            mesh_runner: 0,
+            mesh_drone: 0,
+            mesh_core: 0,
+            mesh_trap_spike: 0,
+            mesh_trap_gas: 0,
+            mesh_trap_laser: 0,
+            // Textures
             floor_metal: 0,
             floor_grate: 0,
             floor_panel: 0,
@@ -478,12 +504,24 @@ impl Assets {
 static mut GAME: MaybeUninit<GameState> = MaybeUninit::uninit();
 static mut ASSETS: MaybeUninit<Assets> = MaybeUninit::uninit();
 
+/// Camera state - render-only, NOT part of rollback state
+/// Stored separately from GameState because it uses floats for smooth interpolation
+static mut CAMERA: CameraState = CameraState::new();
+
 fn game() -> &'static mut GameState {
     unsafe { GAME.assume_init_mut() }
 }
 
 fn assets() -> &'static Assets {
     unsafe { ASSETS.assume_init_ref() }
+}
+
+fn assets_mut() -> &'static mut Assets {
+    unsafe { ASSETS.assume_init_mut() }
+}
+
+fn camera() -> &'static mut CameraState {
+    unsafe { &mut CAMERA }
 }
 
 // ============================================================================
@@ -1039,127 +1077,268 @@ fn update_doors(state: &mut GameState) {
 // ============================================================================
 
 fn render_facility(state: &GameState) {
+    let a = assets();
+
     unsafe {
+        // Enable depth testing for 3D
+        depth_test(1);
+        cull_mode(1); // Back-face culling
+
         for y in 0..FACILITY_HEIGHT {
             for x in 0..FACILITY_WIDTH {
                 let tile = &state.tiles[y][x];
-                let screen_x = (x as i32 * TILE_SIZE * SCALE) as f32;
-                let screen_y = (y as i32 * TILE_SIZE * SCALE) as f32;
-                let size = (TILE_SIZE * SCALE) as f32;
 
-                let tex = match tile.tile_type {
+                // Convert tile position to 3D world coordinates
+                // Tile (0,0) is at world origin, each tile is 1 unit
+                let world_x = x as f32 + 0.5; // Center of tile
+                let world_z = y as f32 + 0.5; // Y in 2D = Z in 3D
+
+                match tile.tile_type {
                     TileType::Floor | TileType::Entry | TileType::Extract | TileType::Trap | TileType::Core => {
-                        match tile.variant {
-                            0 => assets().floor_metal,
-                            1 => assets().floor_grate,
-                            2 => assets().floor_panel,
-                            _ => assets().floor_damaged,
-                        }
-                    }
-                    TileType::Wall => {
-                        match tile.variant {
-                            0 => assets().wall_solid,
-                            1 => assets().wall_window,
-                            2 => assets().wall_vent,
-                            3 => assets().wall_pipe,
-                            4 => assets().wall_screen,
-                            _ => assets().wall_doorframe,
-                        }
-                    }
-                    TileType::Door => assets().door_closed,
-                };
+                        // Bind floor texture based on variant
+                        let tex = match tile.variant {
+                            0 => a.floor_metal,
+                            1 => a.floor_grate,
+                            2 => a.floor_panel,
+                            _ => a.floor_damaged,
+                        };
+                        texture_bind(tex);
 
-                bind_texture(tex);
-                draw_sprite(screen_x, screen_y, size, size, 0xFFFFFFFF);
+                        // Set color based on special tiles
+                        let color = match tile.tile_type {
+                            TileType::Entry => 0x44FF44FF,    // Green tint for entry
+                            TileType::Extract => 0xFF4444FF,  // Red tint for extract
+                            TileType::Core => 0x44FFFFFF,     // Cyan tint for core spots
+                            TileType::Trap => 0xFF8800FF,     // Orange for traps
+                            _ => 0xFFFFFFFF,                  // White (no tint)
+                        };
+                        set_color(color);
+
+                        // Draw floor plane at Y=0
+                        push_identity();
+                        push_translate(world_x, 0.0, world_z);
+                        draw_mesh(a.mesh_floor);
+                    }
+
+                    TileType::Wall => {
+                        // Bind wall texture based on variant
+                        let tex = match tile.variant {
+                            0 => a.wall_solid,
+                            1 => a.wall_window,
+                            2 => a.wall_vent,
+                            3 => a.wall_pipe,
+                            4 => a.wall_screen,
+                            _ => a.wall_doorframe,
+                        };
+                        texture_bind(tex);
+                        set_color(0xFFFFFFFF);
+
+                        // Draw wall cube, centered at Y=0.5 (bottom at Y=0)
+                        push_identity();
+                        push_translate(world_x, 0.5, world_z);
+                        draw_mesh(a.mesh_wall);
+                    }
+
+                    TileType::Door => {
+                        // Check if door is open/closed
+                        let door = state.doors.iter()
+                            .find(|d| d.x as usize == x && d.y as usize == y);
+
+                        if let Some(d) = door {
+                            if d.state != DoorState::Open {
+                                // Draw closed/locked door
+                                let tex = if d.state == DoorState::Locked {
+                                    a.door_locked
+                                } else {
+                                    a.door_closed
+                                };
+                                texture_bind(tex);
+                                set_color(0xFFFFFFFF);
+
+                                push_identity();
+                                push_translate(world_x, 0.5, world_z);
+                                draw_mesh(a.mesh_door);
+                            }
+                        }
+
+                        // Also draw floor under door
+                        texture_bind(a.floor_metal);
+                        set_color(0xFFFFFFFF);
+                        push_identity();
+                        push_translate(world_x, 0.0, world_z);
+                        draw_mesh(a.mesh_floor);
+                    }
+                }
             }
         }
+
+        // Reset color
+        set_color(0xFFFFFFFF);
     }
 }
 
 fn render_cores(state: &GameState) {
+    let a = assets();
+
     unsafe {
-        let tick = tick_count();
-        let frame = ((tick / 10) % 4) as usize;
+        let tick = tick_count() as u32;
 
         for core in state.cores.iter() {
             if !core.collected {
-                let screen_x = (core.x as i32 * TILE_SIZE * SCALE - TILE_SIZE * SCALE / 2) as f32;
-                let screen_y = (core.y as i32 * TILE_SIZE * SCALE - TILE_SIZE * SCALE / 2) as f32;
-                let size = (TILE_SIZE * 2 * SCALE) as f32;
+                // Core position is in tile coordinates
+                let world_x = core.x as f32 + 0.5;
+                let world_z = core.y as f32 + 0.5;
 
-                bind_texture(assets().core_glow[frame]);
-                draw_sprite(screen_x, screen_y, size, size, 0xFFFFFFFF);
+                // Simple bobbing using triangle wave (tick % 60 gives 0-59, /30 gives 0-1-0)
+                let phase = (tick % 60) as i32;
+                let bob_offset = if phase < 30 { phase } else { 60 - phase } as f32 / 100.0;
+                let world_y = 0.3 + bob_offset;
+
+                // Cyan glow color
+                set_color(0x00FFFFFF);
+                push_identity();
+                push_translate(world_x, world_y, world_z);
+
+                // Rotate slowly (3 degrees per tick = 180 degrees per second at 60fps)
+                push_rotate_y((tick * 3 % 360) as f32);
+
+                draw_mesh(a.mesh_core);
             }
         }
+
+        set_color(0xFFFFFFFF);
     }
 }
 
 fn render_runners(state: &GameState) {
+    let a = assets();
+
     unsafe {
-        for runner in state.runners.iter() {
+        for (idx, runner) in state.runners.iter().enumerate() {
             if runner.state == RunnerState::Dead {
                 continue;
             }
 
-            let frame = ((runner.anim_tick / 8) % 4) as usize;
+            // Convert fixed-point pixel position to world coordinates
+            // 1 tile = 8 pixels = 1 world unit
+            let world_x = fixed_to_int(runner.x) as f32 / TILE_SIZE as f32;
+            let world_z = fixed_to_int(runner.y) as f32 / TILE_SIZE as f32;
 
-            let tex = match runner.state {
-                RunnerState::Idle => assets().runner_idle[frame],
-                RunnerState::Walking => assets().runner_walk[frame],
-                RunnerState::Sprinting => assets().runner_sprint[frame],
-                RunnerState::Crouching => assets().runner_crouch[frame],
-                RunnerState::Dead => assets().runner_death[frame],
+            // Runner color based on index (distinguishes players)
+            let color = match idx {
+                0 => 0x44FF44FF, // Green for runner 1
+                1 => 0x4444FFFF, // Blue for runner 2
+                _ => 0xFFFF44FF, // Yellow for runner 3
             };
 
-            let screen_x = (fixed_to_int(runner.x) * SCALE - 4 * SCALE) as f32;
-            let screen_y = (fixed_to_int(runner.y) * SCALE - 6 * SCALE) as f32;
-            let w = (8 * SCALE) as f32;
-            let h = (12 * SCALE) as f32;
+            // Height based on state
+            let height = match runner.state {
+                RunnerState::Crouching => 0.3,
+                _ => 0.5,
+            };
 
-            bind_texture(tex);
-            draw_sprite(screen_x, screen_y, w, h, 0xFFFFFFFF);
+            set_color(color);
+            push_identity();
+            push_translate(world_x, height, world_z);
+
+            // Rotate runner to face direction
+            let angle = match (runner.facing_x, runner.facing_y) {
+                (1, 0) => 90.0,   // Facing right
+                (-1, 0) => -90.0, // Facing left
+                (0, -1) => 180.0, // Facing up (toward camera)
+                _ => 0.0,         // Facing down (default)
+            };
+            push_rotate_y(angle);
+
+            draw_mesh(a.mesh_runner);
         }
+
+        set_color(0xFFFFFFFF);
     }
 }
 
 fn render_drones(state: &GameState) {
+    let a = assets();
+
     unsafe {
+        let tick = tick_count() as u32;
+
         for drone in state.drones.iter() {
             if !drone.active {
                 continue;
             }
 
-            let frame = ((drone.anim_tick / 8) % 4) as usize;
+            // Convert fixed-point pixel position to world coordinates
+            let world_x = fixed_to_int(drone.x) as f32 / TILE_SIZE as f32;
+            let world_z = fixed_to_int(drone.y) as f32 / TILE_SIZE as f32;
 
-            let screen_x = (fixed_to_int(drone.x) * SCALE - 3 * SCALE) as f32;
-            let screen_y = (fixed_to_int(drone.y) * SCALE - 3 * SCALE) as f32;
-            let size = (6 * SCALE) as f32;
+            // Hovering animation (bobbing)
+            let phase = ((tick + drone.anim_tick as u32 * 17) % 40) as i32;
+            let bob = if phase < 20 { phase } else { 40 - phase } as f32 / 100.0;
+            let world_y = 0.6 + bob;
 
-            bind_texture(assets().drone_hover[frame]);
-            draw_sprite(screen_x, screen_y, size, size, 0xFFFFFFFF);
+            // Red menacing glow for drones
+            set_color(0xFF4444FF);
+            push_identity();
+            push_translate(world_x, world_y, world_z);
+
+            // Slow rotation
+            push_rotate_y((tick * 5 % 360) as f32);
+
+            draw_mesh(a.mesh_drone);
         }
+
+        set_color(0xFFFFFFFF);
     }
 }
 
 fn render_traps(state: &GameState) {
-    unsafe {
-        for trap in state.traps.iter() {
-            let screen_x = (trap.x as i32 * TILE_SIZE * SCALE) as f32;
-            let screen_y = (trap.y as i32 * TILE_SIZE * SCALE) as f32;
-            let size = (TILE_SIZE * SCALE) as f32;
+    let a = assets();
 
-            let tex = match trap.trap_type {
-                TrapType::Spike => assets().trap_spike,
-                TrapType::Gas => assets().trap_gas,
-                TrapType::Laser => assets().trap_laser,
+    unsafe {
+        let tick = tick_count() as u32;
+
+        for trap in state.traps.iter() {
+            // Trap position is in tile coordinates
+            let world_x = trap.x as f32 + 0.5;
+            let world_z = trap.y as f32 + 0.5;
+
+            // Color and mesh based on type and activation state
+            let (mesh, color, height) = match trap.trap_type {
+                TrapType::Spike => {
+                    // Spikes extend when active
+                    let h = if trap.active { 0.4 } else { 0.1 };
+                    let c = if trap.active { 0xFF8888FF } else { 0x888888FF };
+                    (a.mesh_trap_spike, c, h)
+                }
+                TrapType::Gas => {
+                    // Gas cloud hovers when active
+                    let h = if trap.active { 0.3 } else { 0.0 };
+                    let c = if trap.active { 0x88FF88AA } else { 0x448844FF }; // Semi-transparent green
+                    (a.mesh_trap_gas, c, h)
+                }
+                TrapType::Laser => {
+                    // Laser beam appears when active
+                    if !trap.active {
+                        continue; // Don't render inactive lasers
+                    }
+                    (a.mesh_trap_laser, 0xFF0000FF, 0.5) // Bright red laser
+                }
             };
 
-            bind_texture(tex);
+            set_color(color);
+            push_identity();
+            push_translate(world_x, height, world_z);
 
-            // Highlight if active
-            let color = if trap.active { 0xFFFF0000 } else { 0xFFFFFFFF };
-            draw_sprite(screen_x, screen_y, size, size, color);
+            // Spike trap animation - rotate when extending
+            if trap.trap_type == TrapType::Spike && trap.active {
+                push_rotate_y((tick * 15 % 360) as f32);
+            }
+
+            draw_mesh(mesh);
         }
+
+        set_color(0xFFFFFFFF);
     }
 }
 
@@ -1240,9 +1419,38 @@ pub extern "C" fn init() {
 
     // Configure console
     unsafe {
-        set_clear_color(0xFF0A0C0F); // Dark background
+        set_clear_color(0x0A0C0FFF); // Dark background (RRGGBBAA format)
         set_tick_rate(2); // 60fps
         texture_filter(0); // Nearest neighbor (pixelated)
+        render_mode(RENDER_LAMBERT); // Mode 0: Lambert shading for flat-shaded 3D
+    }
+
+    // Create procedural meshes (must be done in init)
+    // Each tile is 1 world unit (8 game pixels)
+    let a = assets_mut();
+    unsafe {
+        // Floor: 1x1 plane on XZ, at Y=0
+        a.mesh_floor = plane_uv(0.5, 0.5, 1, 1);
+
+        // Wall: 1x1x1 cube (half-extent 0.5)
+        a.mesh_wall = cube_uv(0.5, 0.5, 0.5);
+
+        // Door: thin cube (0.8 wide, 1 tall, 0.1 deep)
+        a.mesh_door = cube_uv(0.4, 0.5, 0.05);
+
+        // Runner placeholder: capsule (will be replaced with proper mesh)
+        a.mesh_runner = capsule(0.3, 0.8, 8, 4);
+
+        // Drone placeholder: sphere
+        a.mesh_drone = sphere(0.4, 12, 8);
+
+        // Core placeholder: small cube
+        a.mesh_core = cube_uv(0.25, 0.25, 0.25);
+
+        // Trap meshes
+        a.mesh_trap_spike = cylinder(0.1, 0.0, 0.6, 6); // Cone for spike
+        a.mesh_trap_gas = plane_uv(0.5, 0.5, 1, 1);     // Flat for gas vent
+        a.mesh_trap_laser = cube_uv(0.02, 0.5, 0.02);   // Thin beam for laser
     }
 
     // Load assets from ROM
@@ -1353,74 +1561,93 @@ pub extern "C" fn update() {
 #[no_mangle]
 pub extern "C" fn render() {
     let state = game();
+    let cam = camera();
 
     match state.phase {
         GamePhase::Menu => {
-            // Title screen
-            unsafe {
-                draw_text(
-                    b"OVERRIDE".as_ptr(),
-                    8,
-                    380.0, 200.0,
-                    48.0,
-                    0xFFFFFFFF
-                );
-
-                draw_text(
-                    b"PRESS A TO START".as_ptr(),
-                    16,
-                    340.0, 300.0,
-                    24.0,
-                    0xFF888888
-                );
-            }
+            // Title screen - use 2D rendering
+            draw_text_str("OVERRIDE", 380.0, 200.0, 48.0, 0xFFFFFFFF);
+            draw_text_str("PRESS A TO START", 340.0, 300.0, 24.0, 0x888888FF);
         }
 
         GamePhase::Playing => {
-            // Render game world
+            // Determine local player's role
+            let local_mask = unsafe { local_player_mask() };
+            let (is_overseer, runner_idx) = get_local_role(local_mask, state.overseer_player);
+
+            // Setup camera based on role
+            if is_overseer {
+                // Overseer: god-view from above
+                let facility_center_x = (FACILITY_WIDTH as f32 / 2.0) * (TILE_SIZE as f32 / 8.0);
+                let facility_center_z = (FACILITY_HEIGHT as f32 / 2.0) * (TILE_SIZE as f32 / 8.0);
+                setup_overseer_camera(cam, facility_center_x, facility_center_z);
+            } else {
+                // Runner: third-person chase cam
+                let runner = &state.runners[runner_idx];
+                if runner.state != RunnerState::Dead {
+                    setup_runner_camera(cam, runner.x, runner.y, runner.facing_x, runner.facing_y);
+                } else {
+                    // Dead runners: spectate another runner or overseer view
+                    // Find first alive runner to spectate
+                    let mut found = false;
+                    for (i, r) in state.runners.iter().enumerate() {
+                        if r.state != RunnerState::Dead {
+                            setup_runner_camera(cam, r.x, r.y, r.facing_x, r.facing_y);
+                            found = true;
+                            break;
+                        }
+                    }
+                    if !found {
+                        // All dead - show overseer view
+                        let facility_center_x = (FACILITY_WIDTH as f32 / 2.0) * (TILE_SIZE as f32 / 8.0);
+                        let facility_center_z = (FACILITY_HEIGHT as f32 / 2.0) * (TILE_SIZE as f32 / 8.0);
+                        setup_overseer_camera(cam, facility_center_x, facility_center_z);
+                    }
+                }
+            }
+
+            // Draw environment (sets up atmosphere/fog)
+            unsafe { draw_env(); }
+
+            // Render game world (currently 2D sprites, will become 3D meshes)
             render_facility(state);
             render_traps(state);
             render_cores(state);
             render_runners(state);
             render_drones(state);
+
+            // Render UI overlay (2D, rendered last)
+            unsafe { layer(100); } // UI on top layer
             render_ui(state);
         }
 
         GamePhase::RoundEnd => {
-            // Show results
+            // Show results - reuse playing camera
+            let local_mask = unsafe { local_player_mask() };
+            let (is_overseer, _) = get_local_role(local_mask, state.overseer_player);
+
+            if is_overseer {
+                let facility_center_x = (FACILITY_WIDTH as f32 / 2.0) * (TILE_SIZE as f32 / 8.0);
+                let facility_center_z = (FACILITY_HEIGHT as f32 / 2.0) * (TILE_SIZE as f32 / 8.0);
+                setup_overseer_camera(cam, facility_center_x, facility_center_z);
+            }
+
+            unsafe { draw_env(); }
+
             render_facility(state);
             render_traps(state);
             render_cores(state);
             render_runners(state);
             render_drones(state);
 
-            unsafe {
-                if state.runners_win {
-                    draw_text(
-                        b"RUNNERS WIN!".as_ptr(),
-                        12,
-                        340.0, 250.0,
-                        36.0,
-                        0xFF00FF88
-                    );
-                } else {
-                    draw_text(
-                        b"OVERSEER WINS!".as_ptr(),
-                        14,
-                        320.0, 250.0,
-                        36.0,
-                        0xFFFF3333
-                    );
-                }
-
-                draw_text(
-                    b"PRESS A TO PLAY AGAIN".as_ptr(),
-                    21,
-                    300.0, 320.0,
-                    24.0,
-                    0xFF888888
-                );
+            // Victory/defeat overlay
+            unsafe { layer(100); }
+            if state.runners_win {
+                draw_text_str("RUNNERS WIN!", 340.0, 250.0, 36.0, 0x00FF88FF);
+            } else {
+                draw_text_str("OVERSEER WINS!", 320.0, 250.0, 36.0, 0xFF3333FF);
             }
+            draw_text_str("PRESS A TO PLAY AGAIN", 300.0, 320.0, 24.0, 0x888888FF);
         }
     }
 }
