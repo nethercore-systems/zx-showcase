@@ -1,0 +1,28 @@
+# Build artifacts
+target/
+*.wasm
+*.nczx
+*.rom
+
+# Generated assets (procgen outputs - regenerate with build)
+assets/
+*.wav
+*.obj
+*.gltf
+*.glb
+*.png
+*.jpg
+*.jpeg
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Rust
+Cargo.lock

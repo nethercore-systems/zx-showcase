@@ -1,0 +1,40 @@
+name: Build Games
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        game:
+          - lumina-depths
+          - neon-drift
+          - prism-survivors
+          - override
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-action@stable
+        with:
+          targets: wasm32-unknown-unknown
+
+      - name: Build ${{ matrix.game }}
+        working-directory: games/${{ matrix.game }}
+        run: cargo build --release --target wasm32-unknown-unknown
+
+      - name: Upload WASM
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.game }}-wasm
+          path: games/${{ matrix.game }}/target/wasm32-unknown-unknown/release/*.wasm
