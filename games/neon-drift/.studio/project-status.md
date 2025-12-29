@@ -1,6 +1,6 @@
 # Project Status: Neon Drift
 
-Last updated: 2025-12-29
+Last updated: 2025-12-30
 
 ## Setup Completed
 - [x] Game Design Document (docs/GDD.md)
@@ -23,16 +23,16 @@ Last updated: 2025-12-29
 
 ## Asset Status
 
-### Cars (7/7 Complete)
-| Car | Mesh | Albedo | Emissive |
-|-----|------|--------|----------|
-| Speedster | speedster.obj | speedster.png | speedster_emissive.png |
-| Muscle | muscle.obj | muscle.png | muscle_emissive.png |
-| Racer | racer.obj | racer.png | racer_emissive.png |
-| Drift | drift.obj | drift.png | drift_emissive.png |
-| Phantom | phantom.obj | phantom.png | phantom_emissive.png |
-| Titan | titan.obj | titan.png | titan_emissive.png |
-| Viper | viper.obj | viper.png | viper_emissive.png |
+### Cars (7/7 Complete - Enhanced Quality)
+| Car | Mesh | Tris | Albedo | Emissive |
+|-----|------|------|--------|----------|
+| Speedster | speedster.glb | 742 | speedster.png | speedster_emissive.png |
+| Muscle | muscle.glb | 690 | muscle.png | muscle_emissive.png |
+| Racer | racer.glb | 810 | racer.png | racer_emissive.png |
+| Drift | drift.glb | 734 | drift.png | drift_emissive.png |
+| Phantom | phantom.glb | 742 | phantom.png | phantom_emissive.png |
+| Titan | titan.glb | 762 | titan.png | titan_emissive.png |
+| Viper | viper.glb | 670 | viper.png | viper_emissive.png |
 
 ### Track Segments (5/5 Complete)
 | Segment | Mesh | Texture |
@@ -88,7 +88,24 @@ Last updated: 2025-12-29
 | Crystal Cavern | crystal_cavern.xm | 130 | Bm | Ethereal, tense |
 | Solar Highway | solar_highway.xm | 140 | Fm | Epic, triumphant |
 
-## Recent Changes (2025-12-29)
+## Recent Changes (2025-12-30)
+1. **Enhanced car generator** - Complete rewrite with improved geometry
+2. **Curved body panels** - Tapered boxes, beveled edges, aerodynamic shapes
+3. **Distinct car silhouettes** - Each car type now has unique personality:
+   - Speedster: Sleek low-slung magenta racer (742 tris)
+   - Muscle: Boxy aggressive blue muscle car (690 tris)
+   - Racer: F1-inspired green technical racer (810 tris)
+   - Drift: Wide-body orange Japanese drift car (734 tris)
+   - Phantom: Stealth wedge purple mystery car (742 tris)
+   - Titan: Heavy cyan/silver truck (762 tris)
+   - Viper: Compact yellow sports car (670 tris)
+4. **Improved textures** - Metallic gradients, panel lines, window tint, neon placement
+5. **All cars within ZX budget** - 670-810 triangles (target: 800-1200)
+6. **Fixed car/track direction** - Cars now face +Z (same as track generation direction)
+7. **Fixed AI navigation** - AI cars now steer correctly toward waypoints
+8. **Fixed car selector textures** - Car preview now properly binds albedo/emissive textures
+
+## Previous Changes (2025-12-29)
 1. Created proper asset directory structure (assets/models/)
 2. Converted all 7 car meshes and 14 textures
 3. Added difficulty star ratings to car selection UI

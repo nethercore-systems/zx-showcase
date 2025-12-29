@@ -237,17 +237,17 @@ pub fn render_main_menu() {
     }
 }
 
-/// Returns (mesh_handle, color) for the selected car
-pub fn get_car_assets(sel: u32) -> (u32, u32) {
+/// Returns (mesh_handle, albedo_texture, emissive_texture) for the selected car
+pub fn get_car_assets(sel: u32) -> (u32, u32, u32) {
     unsafe {
         match sel {
-            0 => (MESH_SPEEDSTER, 0xFF3333FF),  // Red
-            1 => (MESH_MUSCLE, 0x3366FFFF),     // Blue
-            2 => (MESH_RACER, 0x33FF33FF),      // Green
-            3 => (MESH_DRIFT, 0xFF9900FF),      // Orange
-            4 => (MESH_PHANTOM, 0x9933FFFF),    // Purple
-            5 => (MESH_TITAN, 0xFFCC00FF),      // Gold
-            _ => (MESH_VIPER, 0x00FFFFFF),      // Cyan
+            0 => (MESH_SPEEDSTER, TEX_SPEEDSTER, TEX_SPEEDSTER_EMISSIVE),
+            1 => (MESH_MUSCLE, TEX_MUSCLE, TEX_MUSCLE_EMISSIVE),
+            2 => (MESH_RACER, TEX_RACER, TEX_RACER_EMISSIVE),
+            3 => (MESH_DRIFT, TEX_DRIFT, TEX_DRIFT_EMISSIVE),
+            4 => (MESH_PHANTOM, TEX_PHANTOM, TEX_PHANTOM_EMISSIVE),
+            5 => (MESH_TITAN, TEX_TITAN, TEX_TITAN_EMISSIVE),
+            _ => (MESH_VIPER, TEX_VIPER, TEX_VIPER_EMISSIVE),
         }
     }
 }
@@ -267,35 +267,49 @@ fn draw_stat_bar(x: f32, y: f32, width: f32, height: f32, value: f32, color: u32
     }
 }
 
-fn render_car_preview_3d(mesh: u32, color: u32, x: f32, y: f32, size: f32, rotation: f32, pulse: f32) {
+fn render_car_preview_3d(mesh: u32, tex_albedo: u32, tex_emissive: u32, x: f32, y: f32, _size: f32, rotation: f32, pulse: f32) {
     unsafe {
-        // Setup a mini viewport for the car preview
-        let preview_size = (size * 1.5) as u32;
-        let vp_x = (x - size * 0.75) as u32;
-        let vp_y = (y - size * 0.5) as u32;
+        // Setup viewport for the car preview area
+        let vp_x = (x - 80.0).max(0.0) as u32;
+        let vp_y = (y - 60.0).max(0.0) as u32;
+        viewport(vp_x, vp_y, 160, 120);
 
-        viewport(vp_x, vp_y, preview_size, preview_size);
+        // Camera looking at origin from an angle
+        camera_set(5.0, 3.0, 5.0, 0.0, 0.5, 0.0);
+        camera_fov(30.0);
 
-        // Set up lighting for the preview (required for PBR mode)
+        // Draw environment for this viewport (sets up 3D projection state)
+        env_gradient(0, 0x1A0533FF, 0x0D0221FF, 0x000000FF, 0x000000FF, 0.0, 0.0);
+        env_blend(0);
+        draw_env();
+
+        // Set up lighting (must be after draw_env)
         light_set(0, -0.3, -0.8, -0.5);
         light_color(0, 0xFFFFFFFF);
-        light_intensity(0, 1.5);
+        light_intensity(0, 2.0);
         light_enable(0);
 
-        // Camera looking at car from front-side angle
-        camera_set(2.0, 1.0, -3.0, 0.0, 0.0, 0.0);
-        camera_fov(45.0);
+        // Enable depth test for proper 3D
+        depth_test(1);
 
-        set_color(color);
-        material_metallic(0.9);
-        material_roughness(0.1);
+        // Bind textures for proper PBR rendering
+        set_color(0xFFFFFFFF);
+        texture_bind(tex_albedo);
+        texture_bind_slot(tex_emissive, 1);
+
+        material_metallic(0.7);
+        material_roughness(0.3);
         material_emissive(2.0 + pulse * 0.5);
 
+        // Car at origin, rotated
         push_identity();
         push_rotate_y(rotation);
-        push_scale(0.8, 0.8, 0.8);
         draw_mesh(mesh);
 
+        // Reset state
+        push_identity();
+        texture_bind(0);
+        texture_bind_slot(0, 1);
         set_color(0xFFFFFFFF);
         viewport_clear();
     }
@@ -348,11 +362,11 @@ pub fn render_car_select() {
             let name_x = card_x + card_width / 2.0 - (name.len() as f32 * 10.0);
             draw_text(name.as_ptr(), name.len() as u32, name_x, 130.0, 20.0, COLOR_WHITE);
 
-            // 3D car preview
-            let (mesh, color) = get_car_assets(sel);
+            // 3D car preview with textures
+            let (mesh, tex_albedo, tex_emissive) = get_car_assets(sel);
             let rotation = t * 30.0 + p as f32 * 90.0;
             let pulse = libm::sinf(t * 2.0 + p as f32) * 0.5 + 0.5;
-            render_car_preview_3d(mesh, color, card_x + card_width / 2.0, 220.0, 100.0, rotation, pulse);
+            render_car_preview_3d(mesh, tex_albedo, tex_emissive, card_x + card_width / 2.0, 220.0, 100.0, rotation, pulse);
 
             // Difficulty stars (below car name)
             let difficulty_stars: &[u8] = match sel {
