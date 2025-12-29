@@ -1,0 +1,21 @@
+# ZX Showcase Procedural Asset Generation
+#
+# Core dependencies (no external packages required for basic operation)
+# The pipeline uses only Python standard library for maximum portability.
+#
+# Optional dependencies for enhanced features:
+
+# For Blender integration (install in Blender's Python):
+# bpy  # (installed with Blender)
+
+# For advanced noise generation:
+# noise>=1.2.2
+
+# For image export (PNG instead of PPM):
+# Pillow>=10.0.0
+
+# For audio synthesis (pyo):
+# pyo>=1.0.5
+
+# For glTF export:
+# pygltflib>=1.16.0

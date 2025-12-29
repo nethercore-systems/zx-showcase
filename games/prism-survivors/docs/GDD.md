@@ -250,24 +250,25 @@ Kill enemies in rapid succession to build combo multiplier:
 
 ## Development Priorities
 
-### Phase 1: Visual Overhaul (Current)
-1. Replace placeholder character textures
-2. Replace placeholder enemy textures
-3. Add arena floor textures per stage
-4. Add title screen background
+### Phase 1: Visual Overhaul ✅ COMPLETE
+1. ✅ Replace placeholder character textures (Blender pipeline)
+2. ✅ Replace placeholder enemy textures (all 13 types)
+3. ✅ Add arena floor textures per stage
+4. ✅ Generate all SFX (18 sounds)
+5. [ ] Add title screen background
 
-### Phase 2: Character Selection
-1. Implement ClassSelect game phase ✓
-2. Add selection UI rendering ✓
-3. Wire up class-based stats ✓
+### Phase 2: Character Selection ✅ COMPLETE
+1. ✅ Implement ClassSelect game phase
+2. ✅ Add selection UI rendering
+3. ✅ Wire up class-based stats
 
-### Phase 3: Polish
-1. Add particle effects for abilities
-2. Add damage numbers
-3. Add combo celebration effects
-4. Add boss intro animations
+### Phase 3: Polish (Current)
+1. [ ] Add particle effects for abilities
+2. [ ] Add damage numbers
+3. [ ] Add combo celebration effects
+4. [ ] Add boss intro animations
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2025-01-28*
+*Document Version: 1.1*
+*Last Updated: 2025-12-29*

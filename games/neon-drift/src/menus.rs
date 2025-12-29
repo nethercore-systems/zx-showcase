@@ -354,6 +354,24 @@ pub fn render_car_select() {
             let pulse = libm::sinf(t * 2.0 + p as f32) * 0.5 + 0.5;
             render_car_preview_3d(mesh, color, card_x + card_width / 2.0, 220.0, 100.0, rotation, pulse);
 
+            // Difficulty stars (below car name)
+            let difficulty_stars: &[u8] = match sel {
+                0 => b"**",   // Speedster - Medium
+                1 => b"**",   // Muscle - Medium
+                2 => b"***",  // Racer - Hard
+                3 => b"**",   // Drift - Medium
+                4 => b"**",   // Phantom - Medium
+                5 => b"*",    // Titan - Easy
+                _ => b"***",  // Viper - Hard
+            };
+            let diff_color = match sel {
+                5 => 0x00FF00FF,  // Titan - Green (easy)
+                2 | 6 => 0xFF3333FF,  // Racer/Viper - Red (hard)
+                _ => 0xFFAA00FF,  // Others - Orange (medium)
+            };
+            let stars_x = card_x + card_width / 2.0 - (difficulty_stars.len() as f32 * 8.0);
+            draw_text(difficulty_stars.as_ptr(), difficulty_stars.len() as u32, stars_x, 155.0, 16.0, diff_color);
+
             // Stats
             let stats_y = 300.0;
             let bar_width = card_width - 60.0;

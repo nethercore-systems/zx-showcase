@@ -222,29 +222,28 @@ Layer 2 (Corona Rings):
 
 ## ROM BUDGET ESTIMATES
 
-### Current Assets (Estimated)
-- 4 cars: ~3,200 tris total
-- 5 track segments: ~1,200 tris total
-- 4 props: ~300 tris total
-- 17 textures (128x128 avg): ~140 KB
-- 11 sounds: ~100 KB
-
-### New Assets
-- 3 new cars: +2,400 tris
-- 2 new track environments (EPU only, no new meshes)
-- 3 new car textures + emissives: +30 KB
-- 0 new sounds needed
+### Final Asset Counts
+- 7 cars: ~5,600 tris total
+- 6 track segments: ~1,200 tris total
+- 5 props: ~300 tris total
+- 27 textures (128x128 avg): ~170 KB
+- 19 sounds: ~100 KB
+- 5 music tracks (XM): ~50 KB
 
 ### Total ROM Estimate: ~350 KB (well within ZX limits)
 
 ---
 
-## IMPLEMENTATION PRIORITY
+## IMPLEMENTATION STATUS
 
-1. Add 3 new car generators (cars.rs)
-2. Add new car textures (textures.rs)
-3. Update nether.toml with new assets
-4. Add new TrackId variants and EPU setups (lib.rs)
-5. Update car/track selection UI with difficulty stars
-6. Regenerate all assets
-7. Test and tune
+All design items have been implemented:
+
+- [x] 7 car meshes and textures (Speedster, Muscle, Racer, Drift, Phantom, Titan, Viper)
+- [x] 6 track segment meshes and textures
+- [x] 5 prop meshes and textures (barrier, boost pad, building, billboard, crystal)
+- [x] 5 EPU track environments (Sunset Strip, Neon City, Void Tunnel, Crystal Cavern, Solar Highway)
+- [x] Car/track selection UI with difficulty stars
+- [x] 11 sound effects + 8 synth samples
+- [x] 5 XM music tracks
+
+**Next:** Build ROM, test in player, balance tuning, publish

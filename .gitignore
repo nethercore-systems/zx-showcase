@@ -13,6 +13,7 @@ assets/
 *.png
 *.jpg
 *.jpeg
+*.ppm
 
 # IDE
 .idea/
@@ -26,3 +27,21 @@ Thumbs.db
 
 # Rust
 Cargo.lock
+
+# Python (procgen scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+*.egg
+venv/
+env/
+.venv/
+
+# Blender
+*.blend1
+*.blend2

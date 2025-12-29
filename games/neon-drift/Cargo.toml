@@ -13,3 +13,6 @@ libm = "0.2"
 opt-level = "s"
 lto = true
 
+# Standalone workspace (not part of parent zx-showcase workspace)
+[workspace]
+

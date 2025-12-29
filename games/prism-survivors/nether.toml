@@ -8,113 +8,113 @@ render_mode = 3  # Mode 3: Specular-Shininess Blinn-Phong
 # === HEROES ===
 [[assets.meshes]]
 id = "knight"
-path = "assets/models/meshes/knight.obj"
+path = "assets/models/meshes/knight.glb"
 
 [[assets.meshes]]
 id = "mage"
-path = "assets/models/meshes/mage.obj"
+path = "assets/models/meshes/mage.glb"
 
 [[assets.meshes]]
 id = "ranger"
-path = "assets/models/meshes/ranger.obj"
+path = "assets/models/meshes/ranger.glb"
 
 [[assets.meshes]]
 id = "cleric"
-path = "assets/models/meshes/cleric.obj"
+path = "assets/models/meshes/cleric.glb"
 
 [[assets.meshes]]
 id = "necromancer"
-path = "assets/models/meshes/necromancer.obj"
+path = "assets/models/meshes/necromancer.glb"
 
 [[assets.meshes]]
 id = "paladin"
-path = "assets/models/meshes/paladin.obj"
+path = "assets/models/meshes/paladin.glb"
 
 # === BASIC ENEMIES ===
 [[assets.meshes]]
 id = "golem"
-path = "assets/models/meshes/golem.obj"
+path = "assets/models/meshes/golem.glb"
 
 [[assets.meshes]]
 id = "crawler"
-path = "assets/models/meshes/crawler.obj"
+path = "assets/models/meshes/crawler.glb"
 
 [[assets.meshes]]
 id = "wisp"
-path = "assets/models/meshes/wisp.obj"
+path = "assets/models/meshes/wisp.glb"
 
 [[assets.meshes]]
 id = "skeleton"
-path = "assets/models/meshes/skeleton.obj"
+path = "assets/models/meshes/skeleton.glb"
 
 [[assets.meshes]]
 id = "shade"
-path = "assets/models/meshes/shade.obj"
+path = "assets/models/meshes/shade.glb"
 
 [[assets.meshes]]
 id = "berserker"
-path = "assets/models/meshes/berserker.obj"
+path = "assets/models/meshes/berserker.glb"
 
 [[assets.meshes]]
 id = "arcane_sentinel"
-path = "assets/models/meshes/arcane_sentinel.obj"
+path = "assets/models/meshes/arcane_sentinel.glb"
 
 # === ELITE ENEMIES ===
 [[assets.meshes]]
 id = "crystal_knight"
-path = "assets/models/meshes/crystal_knight.obj"
+path = "assets/models/meshes/crystal_knight.glb"
 
 [[assets.meshes]]
 id = "void_mage"
-path = "assets/models/meshes/void_mage.obj"
+path = "assets/models/meshes/void_mage.glb"
 
 [[assets.meshes]]
 id = "golem_titan"
-path = "assets/models/meshes/golem_titan.obj"
+path = "assets/models/meshes/golem_titan.glb"
 
 [[assets.meshes]]
 id = "specter_lord"
-path = "assets/models/meshes/specter_lord.obj"
+path = "assets/models/meshes/specter_lord.glb"
 
 # === BOSSES ===
 [[assets.meshes]]
 id = "prism_colossus"
-path = "assets/models/meshes/prism_colossus.obj"
+path = "assets/models/meshes/prism_colossus.glb"
 
 [[assets.meshes]]
 id = "void_dragon"
-path = "assets/models/meshes/void_dragon.obj"
+path = "assets/models/meshes/void_dragon.glb"
 
 # === PICKUPS ===
 [[assets.meshes]]
 id = "xp_gem"
-path = "assets/models/meshes/xp_gem.obj"
+path = "assets/models/meshes/xp_gem.glb"
 
 [[assets.meshes]]
 id = "coin"
-path = "assets/models/meshes/coin.obj"
+path = "assets/models/meshes/coin.glb"
 
 [[assets.meshes]]
 id = "powerup_orb"
-path = "assets/models/meshes/powerup_orb.obj"
+path = "assets/models/meshes/powerup_orb.glb"
 
 # === ARENA ===
 [[assets.meshes]]
 id = "arena_floor"
-path = "assets/models/meshes/arena_floor.obj"
+path = "assets/models/meshes/arena_floor.glb"
 
 # === PROJECTILES ===
 [[assets.meshes]]
 id = "frost_shard"
-path = "assets/models/meshes/frost_shard.obj"
+path = "assets/models/meshes/frost_shard.glb"
 
 [[assets.meshes]]
 id = "void_orb"
-path = "assets/models/meshes/void_orb.obj"
+path = "assets/models/meshes/void_orb.glb"
 
 [[assets.meshes]]
 id = "lightning_bolt"
-path = "assets/models/meshes/lightning_bolt.obj"
+path = "assets/models/meshes/lightning_bolt.glb"
 
 # === HERO TEXTURES ===
 [[assets.textures]]
@@ -280,3 +280,29 @@ path = "assets/audio/select.wav"
 [[assets.sounds]]
 id = "back"
 path = "assets/audio/back.wav"
+
+# === COMBO SOUNDS ===
+[[assets.sounds]]
+id = "combo_5"
+path = "assets/audio/combo_5.wav"
+
+[[assets.sounds]]
+id = "combo_10"
+path = "assets/audio/combo_10.wav"
+
+[[assets.sounds]]
+id = "combo_25"
+path = "assets/audio/combo_25.wav"
+
+[[assets.sounds]]
+id = "combo_50"
+path = "assets/audio/combo_50.wav"
+
+# === EVENT SOUNDS ===
+[[assets.sounds]]
+id = "boss_spawn"
+path = "assets/audio/boss_spawn.wav"
+
+[[assets.sounds]]
+id = "wave_complete"
+path = "assets/audio/wave_complete.wav"
