@@ -4,81 +4,82 @@ title = "NEON DRIFT"
 author = "Nethercore Showcase"
 version = "1.0.0"
 render_mode = 2  # Mode 2: Metallic-Roughness PBR
+compress_textures = true  # BC compression for VRAM budget
 
 # === VEHICLES (7) ===
 [[assets.meshes]]
 id = "speedster"
-path = "assets/models/meshes/speedster.obj"
+path = "assets/models/meshes/speedster.glb"
 
 [[assets.meshes]]
 id = "muscle"
-path = "assets/models/meshes/muscle.obj"
+path = "assets/models/meshes/muscle.glb"
 
 [[assets.meshes]]
 id = "racer"
-path = "assets/models/meshes/racer.obj"
+path = "assets/models/meshes/racer.glb"
 
 [[assets.meshes]]
 id = "drift"
-path = "assets/models/meshes/drift.obj"
+path = "assets/models/meshes/drift.glb"
 
 [[assets.meshes]]
 id = "phantom"
-path = "assets/models/meshes/phantom.obj"
+path = "assets/models/meshes/phantom.glb"
 
 [[assets.meshes]]
 id = "titan"
-path = "assets/models/meshes/titan.obj"
+path = "assets/models/meshes/titan.glb"
 
 [[assets.meshes]]
 id = "viper"
-path = "assets/models/meshes/viper.obj"
+path = "assets/models/meshes/viper.glb"
 
 # === TRACK SEGMENTS (6) ===
 [[assets.meshes]]
 id = "track_straight"
-path = "assets/models/meshes/track_straight.obj"
+path = "assets/models/meshes/track_straight.glb"
 
 [[assets.meshes]]
 id = "track_curve_left"
-path = "assets/models/meshes/track_curve_left.obj"
+path = "assets/models/meshes/track_curve_left.glb"
 
 [[assets.meshes]]
 id = "track_curve_right"
-path = "assets/models/meshes/track_curve_right.obj"
+path = "assets/models/meshes/track_curve_right.glb"
 
 [[assets.meshes]]
 id = "track_tunnel"
-path = "assets/models/meshes/track_tunnel.obj"
+path = "assets/models/meshes/track_tunnel.glb"
 
 [[assets.meshes]]
 id = "track_jump"
-path = "assets/models/meshes/track_jump.obj"
+path = "assets/models/meshes/track_jump.glb"
 
 [[assets.meshes]]
 id = "track_checkpoint"
-path = "assets/models/meshes/track_checkpoint.obj"
+path = "assets/models/meshes/track_checkpoint.glb"
 
 # === PROPS (5) ===
 [[assets.meshes]]
 id = "prop_barrier"
-path = "assets/models/meshes/prop_barrier.obj"
+path = "assets/models/meshes/prop_barrier.glb"
 
 [[assets.meshes]]
 id = "prop_boost_pad"
-path = "assets/models/meshes/prop_boost_pad.obj"
+path = "assets/models/meshes/prop_boost_pad.glb"
 
 [[assets.meshes]]
 id = "prop_billboard"
-path = "assets/models/meshes/prop_billboard.obj"
+path = "assets/models/meshes/prop_billboard.glb"
 
 [[assets.meshes]]
 id = "prop_building"
-path = "assets/models/meshes/prop_building.obj"
+path = "assets/models/meshes/prop_building.glb"
 
 [[assets.meshes]]
 id = "crystal_formation"
-path = "assets/models/meshes/crystal_formation.obj"
+path = "assets/models/meshes/crystal_formation.glb"
 
 # === CAR TEXTURES (Albedo) ===
 [[assets.textures]]
@@ -197,6 +198,11 @@ path = "assets/models/textures/prop_billboard_emissive.png"
 id = "crystal_formation_emissive"
 path = "assets/models/textures/crystal_formation_emissive.png"
 
+# === UI TEXTURES ===
+[[assets.textures]]
+id = "neon_font"
+path = "assets/models/textures/neon_font.png"
+
 # === SOUND EFFECTS (11) ===
 [[assets.sounds]]
 id = "engine_idle"
@@ -276,22 +282,27 @@ id = "synth_arp"
 path = "assets/audio/synth_arp.wav"
 
 # === MUSIC TRACKS (XM Tracker Format) ===
-[[assets.trackers]]
-id = "sunset_strip"
-path = "assets/audio/music/sunset_strip.xm"
-
-[[assets.trackers]]
-id = "neon_city"
-path = "assets/audio/music/neon_city.xm"
-
-[[assets.trackers]]
-id = "void_tunnel"
-path = "assets/audio/music/void_tunnel.xm"
-
-[[assets.trackers]]
-id = "crystal_cavern"
-path = "assets/audio/music/crystal_cavern.xm"
-
-[[assets.trackers]]
-id = "solar_highway"
-path = "assets/audio/music/solar_highway.xm"
+# NOTE: Music requires MilkyTracker/OpenMPT to create valid XM files.
+# These entries are commented out until XM files are composed.
+# The synth samples above (synth_kick, synth_snare, etc.) are ready
+# for use as instruments when composing in a tracker.
+#
+# [[assets.trackers]]
+# id = "sunset_strip"
+# path = "assets/audio/music/sunset_strip.xm"
+#
+# [[assets.trackers]]
+# id = "neon_city"
+# path = "assets/audio/music/neon_city.xm"
+#
+# [[assets.trackers]]
+# id = "void_tunnel"
+# path = "assets/audio/music/void_tunnel.xm"
+#
+# [[assets.trackers]]
+# id = "crystal_cavern"
+# path = "assets/audio/music/crystal_cavern.xm"
+#
+# [[assets.trackers]]
+# id = "solar_highway"
+# path = "assets/audio/music/solar_highway.xm"
