@@ -19,4 +19,3 @@ strip = true
 panic = "abort"
 codegen-units = 1
 
-[workspace]
