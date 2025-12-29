@@ -1,19 +1,26 @@
 # OVERRIDE - Game Design Document
 
-**Version:** 1.0
+**Version:** 2.0
 **Target Platform:** Nethercore ZX
+**Render Mode:** Mode 0 (Lambert) — Simple 3D with flat shading
 **Genre:** Asymmetric Multiplayer (1v3)
 **Players:** 4 (1 Overseer + 3 Runners)
 **Round Duration:** 3-5 minutes
-**Status:** Design Complete
+**Status:** Design Complete (3D Update)
 
 ---
 
 ## Executive Summary
 
-OVERRIDE is a 4-player asymmetric multiplayer game where one player (the Overseer) controls a procedurally-generated facility while three players (the Runners) attempt to collect data cores and escape. The Overseer has a god-view and controls doors, traps, lights, and security drones, but is limited by an energy system. Runners have a close chase-cam with limited visibility, relying on stealth, speed, and teamwork to survive.
+OVERRIDE is a 4-player asymmetric multiplayer game where one player (the Overseer) controls a procedurally-generated 3D facility while three players (the Runners) attempt to collect data cores and escape. The Overseer has an elevated god-view and controls doors, traps, lights, and security drones, but is limited by an energy system. Runners have a low-angle third-person camera with limited visibility, relying on stealth, speed, and teamwork to survive.
 
-The game showcases ZX's rollback netcode with asymmetric game states, procedural generation for infinite replayability, and creates viral "almost got you" moments perfect for streaming and social sharing.
+**3D Technical Approach:** Override uses **Mode 0 (Lambert)** for simple, fast 3D rendering. This provides:
+- Flat-shaded geometry with strong silhouettes
+- Texture × vertex color blending (no complex lighting)
+- Optimal performance for rollback (minimal per-frame state)
+- Stylized industrial aesthetic (intentionally non-realistic)
+
+The game showcases ZX's rollback netcode with asymmetric game states, procedural 3D facility generation for infinite replayability, and creates viral "almost got you" moments perfect for streaming and social sharing.
 
 ---
 
@@ -130,10 +137,11 @@ Match Victory: First player to win 3 rounds
 
 ### 3.1 Generation Algorithm
 
-**Tile-Based Grid System:**
-- Facility is 8x8 grid of room tiles
-- Each tile is 40x22 pixels (320/8 x 176/8)
-- Total playable area: 320x176 (bottom 4 pixels for minimal UI)
+**3D Tile-Based Grid System:**
+- Facility is 8x8 grid of modular 3D room tiles
+- Each tile is 10×10 world units (80 world units total)
+- Room height: 4 world units (single story)
+- Walls, floors, ceilings are 3D meshes with texture-tinted vertex colors
 
 **Room Types:**
 
@@ -240,67 +248,95 @@ Stats:
 
 ### 5.1 Art Direction
 
-**Style:** Dark sci-fi industrial
-- Muted color palette (grays, dark blues, steel)
-- High contrast for readability
+**Style:** Dark sci-fi industrial (3D Mode 0)
+- Flat-shaded 3D geometry with strong silhouettes
+- Muted color palette (grays, dark blues, steel) via vertex colors
+- High contrast for readability (bright accents against dark base)
 - Accent colors for gameplay elements:
-  - Cyan: Data Cores, Extraction Point
-  - Red: Traps, Danger zones
-  - Yellow: Doors, Interactive elements
-  - Green: Runners (friendly indicators)
+  - Cyan (`#00FFFF`): Data Cores, Extraction Point, Runner visors
+  - Red (`#FF3333`): Traps, Danger zones, Drones, Locked doors
+  - Yellow (`#FFCC00`): Doors, Interactive elements, Warnings
+  - Green (`#00FF88`): Runner suits (player identity)
 
-**Resolution:** 320x180 native (ZX standard)
+**Technical Rendering (Mode 0):**
+- Resolution: 960×540 (ZX standard)
+- Render Mode: 0 (Lambert) — `texture_sample * vertex_color`
+- No dynamic lighting (all shading baked into vertex colors)
+- Strong edge detection via color contrast
+- Fog for atmosphere and view distance limiting
 
-### 5.2 Asset List
+### 5.2 Asset List (3D)
 
-**Tilesets:**
-| Asset | Size | Variants | Notes |
-|-------|------|----------|-------|
-| Floor tiles | 8x8 | 4 | Metal, grate, panel, damaged |
-| Wall tiles | 8x8 | 6 | Solid, window, vent, pipe, screen, door frame |
-| Door | 8x16 | 3 states | Open, closed, locked |
-| Trap indicators | 8x8 | 3 | Spike, vent, laser |
+**Environment Meshes:**
+| Asset | Poly Budget | Texture Size | Notes |
+|-------|-------------|--------------|-------|
+| Floor tile (10×10 unit) | 4-20 tris | 128×128 | Metal, grate, panel, damaged variants |
+| Wall section (10×4 unit) | 4-30 tris | 128×128 | Solid, window, vent, pipe, screen, doorframe |
+| Door | 20-50 tris | 128×128 | Animated open/close/locked states |
+| Corner/junction | 10-40 tris | 128×128 | T-junction, L-corner, cross |
+| Ceiling panel | 4 tris | 64×64 | Simple flat with occasional vent |
 
-**Characters:**
-| Asset | Size | Frames | Notes |
-|-------|------|--------|-------|
-| Runner | 8x12 | 24 | Idle(2), Walk(8), Sprint(8), Crouch(4), Death(2) |
-| Drone | 6x6 | 4 | Hover animation loop |
+**Character Meshes:**
+| Asset | Poly Budget | Texture Size | Animation Frames | Notes |
+|-------|-------------|--------------|------------------|-------|
+| Runner | 300-500 tris | 256×256 | 24 keyframes | Idle, walk, sprint, crouch, death |
+| Drone | 100-200 tris | 128×128 | 4 keyframes | Hover bob animation |
+| Data Core | 50-100 tris | 64×64 | 8 keyframes | Rotation + pulse glow |
 
-**Effects:**
-| Asset | Size | Frames | Notes |
-|-------|------|--------|-------|
-| Gas cloud | 16x16 | 4 | Loop animation |
-| Laser beam | 1x8 | 2 | Flicker effect |
-| Spike | 8x8 | 3 | Retract, extend, hold |
-| Core glow | 8x8 | 4 | Pulse animation |
-| Sprint dust | 4x4 | 3 | Particle effect |
+**Trap Meshes:**
+| Asset | Poly Budget | Texture Size | Notes |
+|-------|-------------|--------------|-------|
+| Spike plate | 30-60 tris | 64×64 | Floor-mounted, animated extend |
+| Gas vent | 20-40 tris | 64×64 | Ceiling grate, particle spawn point |
+| Laser emitter | 40-80 tris | 64×64 | Wall-mounted, beam is billboard |
 
-**UI Elements:**
+**Effects (Billboards/Particles):**
+| Asset | Type | Texture Size | Notes |
+|-------|------|--------------|-------|
+| Gas cloud | Billboard cluster | 64×64 | Animated UV scroll |
+| Laser beam | Stretched billboard | 16×128 | Additive blend |
+| Core glow | Billboard | 32×32 | Pulsing emission via vertex color |
+| Sprint dust | Point sprites | 16×16 | Particle system |
+| Footstep impact | Decal | 32×32 | Fades out |
+
+**UI Elements (2D Overlay):**
 | Asset | Size | Notes |
 |-------|------|-------|
-| Energy bar | 64x6 | Overseer HUD |
-| Core indicator | 8x8 x3 | Shows collected cores |
-| Timer | 32x8 | Countdown display |
-| Minimap frame | 48x48 | Overseer only |
+| Energy bar | 200×20 px | Overseer HUD, left side |
+| Core indicator | 40×40 px ×3 | Bottom center, shows collected |
+| Timer | 80×30 px | Top center, countdown |
+| Power buttons | 50×50 px ×6 | Overseer right side panel |
+| Minimap | 160×160 px | Overseer corner (toggle) |
 
-### 5.3 Camera Systems
+### 5.3 Camera Systems (3D)
 
-**Runner Camera (Chase-Cam):**
+**Runner Camera (Low-Angle Third-Person):**
 ```
-- Position: 24 pixels behind Runner, 16 pixels above
-- View cone: ~90 degrees forward
-- Smooth follow with slight lag (0.1s lerp)
-- Screen shows: 160x90 pixel area (half of full res)
-- Black fog outside view cone
+- Position: 8 units behind Runner, 3 units above
+- Look-at: Runner position + 1 unit up (chest height)
+- FOV: 70 degrees
+- Smooth follow: 0.15s lerp for position, 0.08s for rotation
+- View limiting: Fog starts at 20 units, full at 40 units
+- Cannot see through walls (occlusion via fog + geometry)
+- Creates claustrophobic tension
 ```
 
-**Overseer Camera (God-View):**
+**Overseer Camera (Elevated God-View):**
 ```
-- Position: Centered on facility
-- Shows: Entire 320x176 facility
-- Zoom: Fixed 1:1
-- Can click/select anywhere
+- Position: 60 units above facility center
+- Look-at: Facility center (0, 0, 0)
+- Projection: Orthographic (60 units wide)
+- Shows: Entire 80×80 unit facility
+- Can click anywhere to target powers
+- All Runners visible as colored markers
+- Traps and doors clearly visible with state indicators
+```
+
+**Camera Transition:**
+```
+- Match start: Brief facility overview (3s), then zoom to role-appropriate view
+- Death: Camera pulls back, follows surviving teammates
+- Spectate: Cycle between surviving Runners or free-cam
 ```
 
 ---
@@ -439,29 +475,47 @@ fn render(state: &GameState, local_player: PlayerId) {
 
 | Resource | Budget | Estimated Use | Remaining |
 |----------|--------|---------------|-----------|
-| WASM Code | 256 KB | ~180 KB | 76 KB |
-| Assets | 768 KB | ~400 KB | 368 KB |
-| RAM | 8 MB | ~4 MB | 4 MB |
-| Netcode Reserve | 1 MB | 1 MB (fixed) | 0 |
+| ROM (Total) | 16 MB | ~2.5 MB | 13.5 MB |
+| WASM Code | — | ~200 KB | — |
+| VRAM | 4 MB | ~1.5 MB | 2.5 MB |
+| RAM | 4 MB | ~500 KB | 3.5 MB |
 
-### 8.2 Asset Budget Breakdown
+### 8.2 Asset Budget Breakdown (3D)
 
-| Category | Budget | Items |
-|----------|--------|-------|
-| Tilesets | 50 KB | Floor, walls, doors, traps |
-| Characters | 30 KB | Runner (24 frames), Drone (4 frames) |
-| Effects | 20 KB | Gas, laser, spike, particles |
-| UI | 30 KB | HUD elements, fonts, icons |
-| Audio SFX | 150 KB | ~15 sound effects |
-| Audio Music | 100 KB | 5 tracks (compressed) |
-| **Total** | **380 KB** | Well under 768 KB limit |
+| Category | Size | Items |
+|----------|------|-------|
+| Environment meshes | ~300 KB | Floor/wall/door/corner tiles (64 variants) |
+| Character meshes | ~200 KB | Runner (with animations), Drone, Data Core |
+| Trap meshes | ~50 KB | Spike, gas vent, laser emitter |
+| Textures (RGBA8) | ~800 KB | Environment (128×128), characters (256×256) |
+| Effect textures | ~100 KB | Billboards, particles, UI sprites |
+| UI textures | ~150 KB | HUD elements, fonts, icons |
+| Audio SFX | ~400 KB | 16 sound effects |
+| Audio Music | ~500 KB | 5 adaptive tracks |
+| **Total** | **~2.5 MB** | Well under 16 MB limit |
 
-### 8.3 Performance Targets
+### 8.3 Rendering Budget (Mode 0)
+
+| Metric | Budget | Typical Scene |
+|--------|--------|---------------|
+| Draw calls | <100 | ~40-60 |
+| Total triangles | <50,000 | ~15,000-25,000 |
+| Texture binds | <20 | ~8-12 |
+| Active billboards | <100 | ~20-50 |
+
+**Mode 0 Advantages:**
+- No lighting calculations → faster rendering
+- Fewer texture samples → reduced memory bandwidth
+- Simpler shader → more headroom for geometry
+- Vertex color tinting → flexible without texture changes
+
+### 8.4 Performance Targets
 
 - **Frame Rate:** 60 FPS locked
 - **Input Latency:** <3 frames (50ms)
 - **Rollback Window:** 8 frames
 - **Netcode Tick Rate:** 60 Hz
+- **State Snapshot Size:** <50 KB (fast rollback)
 
 ---
 
@@ -469,43 +523,55 @@ fn render(state: &GameState, local_player: PlayerId) {
 
 ### 9.1 Screens
 
-**Main Menu:**
+**Main Menu (3D backdrop of rotating facility):**
 ```
-┌────────────────────────────────────────┐
-│                                        │
-│            O V E R R I D E             │
-│                                        │
-│           [ PLAY ONLINE ]              │
-│           [ LOCAL GAME ]               │
-│           [  SETTINGS  ]               │
-│                                        │
-└────────────────────────────────────────┘
-```
-
-**Runner HUD:**
-```
-┌────────────────────────────────────────┐
-│ CORES: [■][■][□]          TIME: 3:42   │
-│                                        │
-│                                        │
-│           (Chase-cam view)             │
-│                                        │
-│                                        │
-└────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                                                          │
+│                    O V E R R I D E                       │
+│                   ═══════════════                        │
+│                                                          │
+│                  [ PLAY ONLINE ]                         │
+│                  [ LOCAL GAME  ]                         │
+│                  [  SETTINGS   ]                         │
+│                                                          │
+│                                                          │
+└──────────────────────────────────────────────────────────┘
+        (960×540 - slow camera orbit around facility mesh)
 ```
 
-**Overseer HUD:**
+**Runner HUD (3D third-person view):**
 ```
-┌────────────────────────────────────────┐
-│ ENERGY: [████████░░]      TIME: 3:42   │
-├───────────────────────────┬────────────┤
-│                           │ [DOOR]  10 │
-│                           │ [LIGHT] 15 │
-│    (God-view facility)    │ [TRAP]  20 │
-│                           │ [DRONE] 30 │
-│                           │ [ALARM] 10 │
-│                           │ [PING]   5 │
-└───────────────────────────┴────────────┘
+┌──────────────────────────────────────────────────────────┐
+│                      TIME: 3:42                          │
+│                                                          │
+│                                                          │
+│                                                          │
+│           (Low-angle third-person 3D view)               │
+│              - Fog limits visibility -                   │
+│              - Walls block view -                        │
+│                                                          │
+│                                                          │
+│                   CORES: [●][●][○]                       │
+└──────────────────────────────────────────────────────────┘
+        (960×540 - minimal HUD, maximum immersion)
+```
+
+**Overseer HUD (3D orthographic god-view):**
+```
+┌──────────────────────────────────────────────────────────┐
+│ ENERGY [████████░░] 75/100             TIME: 3:42        │
+├──────────────────────────────────────────────┬───────────┤
+│                                              │ [⚡DOOR]10│
+│                                              │ [💡LIGHT]15│
+│       (3D orthographic facility view)        │ [⚠TRAP]20│
+│                                              │ [🤖DRONE]30│
+│         ● = Runners (green markers)          │ [🔔ALARM]10│
+│         ◆ = Data Cores (cyan)                │ [📡PING]5 │
+│         ▲ = Active traps (red)               │───────────│
+│                                              │  MINIMAP  │
+│                                              │  [toggle] │
+└──────────────────────────────────────────────┴───────────┘
+        (960×540 - power panel on right, map dominates)
 ```
 
 ---
@@ -590,6 +656,7 @@ OVERRIDE differentiates through:
 
 ---
 
-*Document Version: 1.0*
-*Last Updated: 2025-12-28*
-*Status: Ready for Implementation*
+*Document Version: 2.0*
+*Last Updated: 2025-12-29*
+*Status: Ready for Implementation (3D Mode 0)*
+*Render Mode: 0 (Lambert) — Simple 3D with flat shading*

@@ -7,8 +7,8 @@
 
 ## Foundation (Complete)
 - [x] Game Design Document (`docs/GDD.md`)
-- [x] Creative Direction (`.claude/creative-direction.local.md`)
-- [x] Sonic Identity (`.claude/sonic-identity.local.md`)
+- [x] Creative Direction (`.studio/creative-direction.local.md`)
+- [x] Sonic Identity (`.studio/sonic-identity.local.md`)
 - [x] Game Code (~2,254 lines) - exploration, creature AI, zones, discovery, encounters
 
 ---

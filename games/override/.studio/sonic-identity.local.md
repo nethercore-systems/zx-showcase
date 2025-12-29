@@ -1,12 +1,13 @@
 ---
 # Sonic Style Language Specification
-# Override - Asymmetric Multiplayer
+# Override - Asymmetric Multiplayer (3D Mode 0)
 
 game: "Override"
-version: 1.0
+version: 2.0
+render_mode: 0  # Lambert - visual style affects audio expectations
 
 identity:
-  tagline: "Industrial surveillance thriller in 8 bits"
+  tagline: "Industrial surveillance thriller in low-poly 3D"
   audio_pillars:
     - "Mechanical Dread - Facility as living threat"
     - "Surveillance Presence - Always being watched"
@@ -149,14 +150,14 @@ instruments:
 | Traps | 50-100% | Proximity warning |
 | Music | 100% | Responds to personal danger |
 
-### Runner Proximity Audio
+### Runner Proximity Audio (3D Distance)
 
-| Distance | Volume | Filtering |
-|----------|--------|-----------|
-| 0-24px | 100% | None |
-| 24-48px | 70% | Light lowpass (4kHz) |
-| 48-64px | 40% | Heavy lowpass (2kHz) |
-| 64px+ | 0% | Inaudible |
+| Distance (units) | Volume | Filtering |
+|------------------|--------|-----------|
+| 0-12 | 100% | None |
+| 12-24 | 70% | Light lowpass (4kHz) |
+| 24-40 | 40% | Heavy lowpass (2kHz) |
+| 40+ | 0% | Inaudible (beyond fog) |
 
 ---
 

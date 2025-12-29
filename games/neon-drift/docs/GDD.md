@@ -147,7 +147,7 @@ See `DESIGN_NOTES.md` for detailed track specifications and EPU environment conf
 - [ ] Balance tuning
 - [ ] Publish to nethercore.systems
 
-See `.claude/project-status.md` for detailed asset inventory.
+See `.studio/project-status.md` for detailed asset inventory.
 
 ---
 

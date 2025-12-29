@@ -4,8 +4,8 @@ Last updated: 2025-12-29
 
 ## Setup Completed
 - [x] Game Design Document (docs/GDD.md)
-- [x] Creative Direction (.claude/creative-direction.local.md)
-- [x] Sonic Identity (.claude/sonic-identity.local.md)
+- [x] Creative Direction (.studio/creative-direction.local.md)
+- [x] Sonic Identity (.studio/sonic-identity.local.md)
 - [x] Design Notes (DESIGN_NOTES.md - detailed asset specs)
 
 ## Phase
