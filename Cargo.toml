@@ -1,5 +1,6 @@
 [workspace]
 members = ["xtask"]
+exclude = ["games/lumina-depths", "games/neon-drift", "games/prism-survivors", "games/override"]
 resolver = "2"
 
 # Note: Games are NOT workspace members because:

@@ -619,6 +619,82 @@ def generate_all_prism_survivors(style: UniversalStyleParams, output_dir: Path):
     print("=" * 60)
 
 
+def generate_lumina_depths_creatures(output_dir: Path):
+    """Generate all creature meshes for Lumina Depths using metaballs."""
+    from procgen.games.lumina_depths.blender_creatures import generate_all_creatures
+
+    print("\n" + "=" * 60)
+    print("  LUMINA DEPTHS - CREATURE GENERATION (METABALLS)")
+    print("=" * 60)
+
+    meshes_dir = output_dir / "meshes"
+    meshes_dir.mkdir(parents=True, exist_ok=True)
+
+    count = generate_all_creatures(meshes_dir)
+
+    print("\n" + "=" * 60)
+    print(f"  Generated {count} creatures to: {meshes_dir}")
+    print("=" * 60)
+
+
+def generate_lumina_depths_asset(asset_name: str, output_dir: Path):
+    """Generate a single Lumina Depths asset by name."""
+    from procgen.games.lumina_depths.blender_creatures import CREATURE_GENERATORS
+
+    meshes_dir = output_dir / "meshes"
+    meshes_dir.mkdir(parents=True, exist_ok=True)
+
+    if asset_name not in CREATURE_GENERATORS:
+        print(f"Error: Unknown asset '{asset_name}'")
+        print(f"Available assets: {', '.join(CREATURE_GENERATORS.keys())}")
+        return
+
+    generator = CREATURE_GENERATORS[asset_name]
+    generator(meshes_dir)
+    print(f"Generated: {asset_name}")
+
+
+def generate_lumina_depths_zone(zone: str, output_dir: Path):
+    """Generate all creatures for a specific zone."""
+    from procgen.games.lumina_depths.blender_creatures import (
+        generate_all_zone1, generate_all_zone2,
+        generate_all_zone3, generate_all_zone4, generate_all_epic,
+    )
+
+    meshes_dir = output_dir / "meshes"
+    meshes_dir.mkdir(parents=True, exist_ok=True)
+
+    zone_map = {
+        "zone1": generate_all_zone1,
+        "zone2": generate_all_zone2,
+        "zone3": generate_all_zone3,
+        "zone4": generate_all_zone4,
+        "epic": generate_all_epic,
+    }
+
+    if zone not in zone_map:
+        print(f"Error: Unknown zone '{zone}'")
+        print(f"Available zones: {', '.join(zone_map.keys())}")
+        return
+
+    count = zone_map[zone](meshes_dir)
+    print(f"Generated {count} creatures for {zone}")
+
+
+def generate_all_lumina_depths(output_dir: Path):
+    """Generate all assets for Lumina Depths."""
+    print("\n" + "=" * 60)
+    print("  LUMINA DEPTHS - FULL ASSET GENERATION")
+    print("=" * 60)
+
+    generate_lumina_depths_creatures(output_dir)
+    # TODO: Add flora, terrain, audio generation when implemented
+
+    print("\n" + "=" * 60)
+    print(f"  ALL ASSETS EXPORTED TO: {output_dir}")
+    print("=" * 60)
+
+
 def main():
     # Parse arguments after '--'
     argv = sys.argv
@@ -631,22 +707,18 @@ def main():
     parser.add_argument("--game", required=True, choices=["neon-drift", "lumina-depths", "prism-survivors"],
                         help="Target game")
     parser.add_argument("--all", action="store_true", help="Generate all assets")
-    parser.add_argument("--heroes", action="store_true", help="Generate hero assets only")
-    parser.add_argument("--enemies", action="store_true", help="Generate enemy assets only")
-    parser.add_argument("--pickups", action="store_true", help="Generate pickup/projectile assets only")
-    parser.add_argument("--arena", action="store_true", help="Generate arena and stage textures only")
-    parser.add_argument("--font", action="store_true", help="Generate font texture only")
-    parser.add_argument("--audio", action="store_true", help="Generate audio SFX only")
+    parser.add_argument("--heroes", action="store_true", help="Generate hero assets only (prism-survivors)")
+    parser.add_argument("--enemies", action="store_true", help="Generate enemy assets only (prism-survivors)")
+    parser.add_argument("--pickups", action="store_true", help="Generate pickup/projectile assets (prism-survivors)")
+    parser.add_argument("--arena", action="store_true", help="Generate arena and stage textures (prism-survivors)")
+    parser.add_argument("--font", action="store_true", help="Generate font texture (prism-survivors)")
+    parser.add_argument("--audio", action="store_true", help="Generate audio SFX")
+    parser.add_argument("--creatures", action="store_true", help="Generate creature meshes (lumina-depths)")
+    parser.add_argument("--zone", type=str, help="Generate specific zone (zone1, zone2, zone3, zone4, epic)")
     parser.add_argument("--asset", type=str, help="Generate specific asset by name")
     parser.add_argument("--output", type=str, help="Custom output directory")
 
     args = parser.parse_args(argv)
-
-    # Get style tokens
-    style = get_style_tokens(args.game)
-    if style is None:
-        print(f"Error: No style tokens found for game '{args.game}'")
-        sys.exit(1)
 
     # Get output directory
     if args.output:
@@ -657,11 +729,17 @@ def main():
     output_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"Game: {args.game}")
-    print(f"Style: {style.style_name}")
     print(f"Output: {output_dir}")
 
-    # Generate based on flags
+    # Generate based on game and flags
     if args.game == "prism-survivors":
+        # Get style tokens for prism-survivors
+        style = get_style_tokens(args.game)
+        if style is None:
+            print(f"Error: No style tokens found for game '{args.game}'")
+            sys.exit(1)
+        print(f"Style: {style.style_name}")
+
         if args.all:
             generate_all_prism_survivors(style, output_dir)
         elif args.heroes:
@@ -679,9 +757,22 @@ def main():
         else:
             print("No generation flag specified. Use --all, --heroes, --enemies, etc.")
             parser.print_help()
+
+    elif args.game == "lumina-depths":
+        if args.all:
+            generate_all_lumina_depths(output_dir)
+        elif args.creatures:
+            generate_lumina_depths_creatures(output_dir)
+        elif args.zone:
+            generate_lumina_depths_zone(args.zone, output_dir)
+        elif args.asset:
+            generate_lumina_depths_asset(args.asset, output_dir)
+        else:
+            print("No generation flag specified. Use --all, --creatures, --zone <zone>, or --asset <name>")
+            parser.print_help()
+
     else:
         print(f"Game '{args.game}' not fully implemented yet in Blender pipeline.")
-        print("Use the original run.py for OBJ/PPM output.")
 
 
 if __name__ == "__main__":

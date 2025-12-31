@@ -62,7 +62,8 @@ pub fn install_games(game_filter: Option<&str>) -> Result<()> {
 /// Install a single game, returns Ok(false) if game wasn't built
 pub fn install_single_game(game: &GameConfig) -> Result<bool> {
     let install_dir = games_dir()?;
-    let rom_path = game.path.join("rom.nczx");
+    let rom_filename = format!("{}.nczx", game.id);
+    let rom_path = game.path.join(&rom_filename);
 
     if !rom_path.exists() {
         return Ok(false);
@@ -71,7 +72,7 @@ pub fn install_single_game(game: &GameConfig) -> Result<bool> {
     let game_install_dir = install_dir.join(&game.id);
     fs::create_dir_all(&game_install_dir)?;
 
-    // Copy ROM
+    // Copy ROM (install as rom.nczx to match player expectations)
     let dest_rom = game_install_dir.join("rom.nczx");
     fs::copy(&rom_path, &dest_rom).context(format!("Failed to copy ROM for {}", game.id))?;
 

@@ -1,5 +1,6 @@
 //! Build orchestration for games
 
+use crate::asset_gen::find_blender;
 use crate::config::{discover_games, AssetStrategy, GameConfig};
 use anyhow::{bail, Context, Result};
 use colored::Colorize;
@@ -62,11 +63,16 @@ pub fn build_all(skip_assets: bool, parallel: bool) -> Result<()> {
     if !skip_assets {
         println!("{}", "Phase 1: Asset Generation".bold());
         println!("{}", "-------------------------".dimmed());
+        let blender = find_blender().ok();
         for game in &games {
             print!("  {} ... ", game.id);
-            match crate::asset_gen::generate_for_game(game) {
-                Ok(_) => println!("{}", "OK".green()),
-                Err(e) => println!("{} - {}", "WARN".yellow(), e),
+            if let Some(ref blender_path) = blender {
+                match crate::asset_gen::generate_for_game(game, blender_path) {
+                    Ok(_) => println!("{}", "OK".green()),
+                    Err(e) => println!("{} - {}", "WARN".yellow(), e),
+                }
+            } else {
+                println!("{} - Blender not found", "SKIP".yellow());
             }
         }
         println!();
@@ -81,7 +87,7 @@ pub fn build_all(skip_assets: bool, parallel: bool) -> Result<()> {
     let skip_count = AtomicUsize::new(0);
 
     let build_game_fn = |game: &GameConfig| {
-        // Skip games without assets (unless they use build.rs)
+        // Skip games without assets (unless they use build.rs which generates on build)
         if !matches!(game.asset_strategy, AssetStrategy::BuildRs) && !game.has_assets() {
             println!(
                 "  {} {} (no assets)",
@@ -157,7 +163,8 @@ pub fn build_game(game_id: &str, skip_assets: bool) -> Result<()> {
 
     if !skip_assets {
         println!("  Generating assets...");
-        crate::asset_gen::generate_for_game(game)?;
+        let blender = find_blender()?;
+        crate::asset_gen::generate_for_game(game, &blender)?;
     }
 
     println!("  Compiling and packing...");
@@ -192,10 +199,11 @@ fn build_single_game(game: &GameConfig, nether_exe: &Path) -> Result<()> {
         bail!("Build failed:\n{}\n{}", stdout, stderr);
     }
 
-    // Verify rom.nczx was created
-    let rom_path = game.path.join("rom.nczx");
+    // Verify {game_id}.nczx was created
+    let rom_filename = format!("{}.nczx", game.id);
+    let rom_path = game.path.join(&rom_filename);
     if !rom_path.exists() {
-        bail!("Expected rom.nczx not found after build");
+        bail!("Expected {} not found after build", rom_filename);
     }
 
     Ok(())
@@ -219,8 +227,8 @@ pub fn clean_all(clean_assets: bool) -> Result<()> {
             std::fs::remove_dir_all(&target_dir).context("Failed to remove target dir")?;
         }
 
-        // Clean ROM file
-        let rom_path = game.path.join("rom.nczx");
+        // Clean ROM file ({game_id}.nczx)
+        let rom_path = game.path.join(format!("{}.nczx", game.id));
         if rom_path.exists() {
             std::fs::remove_file(&rom_path)?;
         }
@@ -235,8 +243,8 @@ pub fn clean_all(clean_assets: bool) -> Result<()> {
                         std::fs::remove_dir_all(&assets_dir)?;
                     }
                 }
-                AssetStrategy::StandaloneTool { .. } => {
-                    // Standalone tool generates to assets/models/
+                AssetStrategy::BlenderPipeline | AssetStrategy::StandaloneTool { .. } => {
+                    // Blender/standalone generates to assets/models/
                     let models_dir = game.path.join("assets").join("models");
                     if models_dir.exists() {
                         std::fs::remove_dir_all(&models_dir)?;

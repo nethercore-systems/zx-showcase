@@ -2,6 +2,7 @@
 ZX Showcase - Procedural Generation Library
 
 Shared utilities for texture, mesh, and audio generation.
+Aligned with zx-procgen generator-patterns skill.
 """
 
 from .texture_buffer import TextureData, create_texture, draw_line, draw_rect, draw_circle
@@ -17,6 +18,27 @@ from .synthesis import (
     lowpass, highpass, bandpass,
     normalize, mix, to_pcm16, save_wav,
 )
+
+# Pure Python mesh primitives (no Blender dependency)
+from .mesh_primitives import (
+    generate_ellipsoid, generate_cylinder, generate_hemisphere,
+    generate_fin, merge_meshes as merge_mesh_tuples, write_obj,
+)
+
+# Pure Python audio DSP (no external dependency)
+from . import audio_dsp
+
+# Blender utilities (only available when running in Blender)
+# from .bpy_utils import (
+#     clear_scene, apply_modifiers, apply_transforms, auto_uv_project,
+#     export_glb, export_obj as export_obj_blender, post_process,
+# )
+
+# Animation utilities (only available when running in Blender)
+# from .animation_utils import (
+#     keyframe_location, keyframe_rotation, keyframe_scale,
+#     set_interpolation, create_bounce, create_spin, create_bob,
+# )
 
 __all__ = [
     # Texture
@@ -36,4 +58,9 @@ __all__ = [
     "apply_adsr", "apply_exponential_decay",
     "lowpass", "highpass", "bandpass",
     "normalize", "mix", "to_pcm16", "save_wav",
+    # Pure Python mesh primitives
+    "generate_ellipsoid", "generate_cylinder", "generate_hemisphere",
+    "generate_fin", "merge_mesh_tuples", "write_obj",
+    # Audio DSP module
+    "audio_dsp",
 ]

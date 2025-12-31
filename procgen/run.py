@@ -249,112 +249,36 @@ def generate_game_assets(game_name: str, output_dir: Path, asset_type: str = "al
 
 
 def _generate_neon_drift(style, output_dir: Path, asset_type: str):
-    """Generate Neon Drift specific assets."""
-    from procgen.core.meshes import create_vehicle_chassis, VehicleParams
-    from procgen.core.textures import generate_grid_pattern
-    from procgen.lib.sfx import generate_game_sfx
+    """Generate Neon Drift specific assets using the new modular pipeline."""
+    from procgen.games.neon_drift import generate_all
 
-    if asset_type in ("all", "meshes", "vehicles"):
-        print("\n--- Vehicles ---")
-        vehicles_dir = output_dir / "vehicles"
-        vehicles_dir.mkdir(exist_ok=True)
+    # Use the new modular Neon Drift generator
+    counts = generate_all(output_dir, asset_type)
 
-        for body_style in ["sport", "muscle"]:
-            params = VehicleParams(body_style=body_style)
-            mesh = create_vehicle_chassis(params)
-            export_mesh_obj(mesh, vehicles_dir / f"car_{body_style}.obj")
-
-    if asset_type in ("all", "textures"):
-        print("\n--- Textures ---")
-        textures_dir = output_dir / "textures"
-        textures_dir.mkdir(exist_ok=True)
-
-        grid = generate_grid_pattern(
-            256, 256, cell_size=32,
-            line_color=(0, 255, 255), bg_color=(10, 10, 30)
-        )
-        export_texture_ppm(grid, textures_dir / "track_grid.ppm")
-
-    if asset_type in ("all", "audio"):
-        print("\n--- Audio ---")
-        audio_dir = output_dir / "audio"
-        audio_dir.mkdir(exist_ok=True)
-
-        sfx = generate_game_sfx("neon-drift")
-        for name, wave in sfx.items():
-            export_audio_wav(wave, audio_dir / f"{name}.wav")
+    total = sum(counts.values())
+    print(f"\nNeon Drift: Generated {total} assets ({counts})")
 
 
 def _generate_lumina_depths(style, output_dir: Path, asset_type: str):
-    """Generate Lumina Depths specific assets."""
-    from procgen.core.textures import generate_voronoi_texture
-    from procgen.lib.sfx import generate_game_sfx
+    """Generate Lumina Depths specific assets using the new modular pipeline."""
+    from procgen.games.lumina_depths import generate_all
 
-    if asset_type in ("all", "textures"):
-        print("\n--- Textures ---")
-        textures_dir = output_dir / "textures"
-        textures_dir.mkdir(exist_ok=True)
+    # Use the new modular Lumina Depths generator
+    counts = generate_all(output_dir, asset_type)
 
-        # Bioluminescent pattern
-        bio = generate_voronoi_texture(
-            256, 256, cell_count=15,
-            color_low=(0, 30, 60), color_high=(0, 200, 255)
-        )
-        export_texture_ppm(bio, textures_dir / "bioluminescent.ppm")
-
-    if asset_type in ("all", "audio"):
-        print("\n--- Audio ---")
-        audio_dir = output_dir / "audio"
-        audio_dir.mkdir(exist_ok=True)
-
-        sfx = generate_game_sfx("lumina-depths")
-        for name, wave in sfx.items():
-            export_audio_wav(wave, audio_dir / f"{name}.wav")
+    total = sum(counts.values())
+    print(f"\nLumina Depths: Generated {total} assets ({counts})")
 
 
 def _generate_prism_survivors(style, output_dir: Path, asset_type: str):
-    """Generate Prism Survivors specific assets."""
-    from procgen.core.meshes import (
-        create_humanoid_mesh, HumanoidParams,
-        create_gem_pickup, create_shard_projectile,
-    )
-    from procgen.lib.sfx import generate_game_sfx
+    """Generate Prism Survivors specific assets using the new modular pipeline."""
+    from procgen.games.prism_survivors import generate_all
 
-    if asset_type in ("all", "meshes", "heroes"):
-        print("\n--- Heroes ---")
-        heroes_dir = output_dir / "heroes"
-        heroes_dir.mkdir(exist_ok=True)
+    # Use the new modular Prism Survivors generator
+    counts = generate_all(output_dir, asset_type)
 
-        for hero_style in ["blocky", "rounded", "angular"]:
-            mesh = create_humanoid_mesh(HumanoidParams(), style=hero_style)
-            export_mesh_obj(mesh, heroes_dir / f"hero_{hero_style}.obj")
-
-    if asset_type in ("all", "meshes", "pickups"):
-        print("\n--- Pickups ---")
-        pickups_dir = output_dir / "pickups"
-        pickups_dir.mkdir(exist_ok=True)
-
-        for gem_type in ["diamond", "emerald", "ruby"]:
-            gem = create_gem_pickup(gem_type=gem_type)
-            export_mesh_obj(gem, pickups_dir / f"gem_{gem_type}.obj")
-
-    if asset_type in ("all", "meshes", "projectiles"):
-        print("\n--- Projectiles ---")
-        proj_dir = output_dir / "projectiles"
-        proj_dir.mkdir(exist_ok=True)
-
-        for shard_type in ["crystal", "glass", "ice"]:
-            shard = create_shard_projectile(shard_type=shard_type)
-            export_mesh_obj(shard, proj_dir / f"shard_{shard_type}.obj")
-
-    if asset_type in ("all", "audio"):
-        print("\n--- Audio ---")
-        audio_dir = output_dir / "audio"
-        audio_dir.mkdir(exist_ok=True)
-
-        sfx = generate_game_sfx("prism-survivors")
-        for name, wave in sfx.items():
-            export_audio_wav(wave, audio_dir / f"{name}.wav")
+    total = sum(counts.values())
+    print(f"\nPrism Survivors: Generated {total} assets ({counts})")
 
 
 def _generate_override(style, output_dir: Path, asset_type: str):
@@ -366,6 +290,60 @@ def _generate_override(style, output_dir: Path, asset_type: str):
 
     total = sum(counts.values())
     print(f"\nOverride: Generated {total} assets ({counts})")
+
+
+def validate_game_assets(game_name: str, assets_dir: Path, quality_target: str) -> bool:
+    """Validate generated assets for a game.
+
+    Returns True if validation passes, False otherwise.
+    """
+    print(f"\n{'='*60}")
+    print(f"Validating {game_name} Assets")
+    print(f"{'='*60}")
+
+    if game_name == "override":
+        from procgen.games.override.validate import validate_all
+        report = validate_all(assets_dir, quality_target)
+        return report.all_pass()
+    elif game_name == "lumina-depths":
+        from procgen.games.lumina_depths.validate import validate_all
+        report = validate_all(assets_dir, quality_target)
+        return report.all_pass()
+    elif game_name == "neon-drift":
+        from procgen.games.neon_drift.validate import validate_all
+        report = validate_all(assets_dir, quality_target)
+        return report.all_pass()
+    elif game_name == "prism-survivors":
+        from procgen.games.prism_survivors.validate import validate_all
+        report = validate_all(assets_dir, quality_target)
+        return report.all_pass()
+    else:
+        # For other games, use generic validation
+        from procgen.core.quality import QualityReport, analyze_texture, analyze_audio
+        report = QualityReport()
+
+        # Check textures
+        for ext in ["*.png", "*.ppm"]:
+            for tex_file in assets_dir.rglob(ext):
+                try:
+                    if ext == "*.png":
+                        from procgen.core.quality import analyze_sprite
+                        quality = analyze_sprite(tex_file)
+                        report.sprites[tex_file.stem] = quality
+                except Exception as e:
+                    print(f"  Warning: Could not analyze {tex_file}: {e}")
+
+        # Check audio
+        for wav_file in assets_dir.rglob("*.wav"):
+            try:
+                quality = analyze_audio(wav_file)
+                report.audio[wav_file.stem] = quality
+            except Exception as e:
+                print(f"  Warning: Could not analyze {wav_file}: {e}")
+
+        print(f"\nScore: {report.overall_score():.1f}/100")
+        print(f"Pass: {report.all_pass()}")
+        return report.all_pass()
 
 
 # ============================================================================
@@ -405,6 +383,11 @@ Examples:
     # Options
     parser.add_argument("--output", type=str, help="Custom output directory")
     parser.add_argument("--preview", action="store_true", help="Open in Blender for preview")
+    parser.add_argument("--validate", action="store_true",
+                        help="Validate generated assets after generation")
+    parser.add_argument("--quality", type=str, default="development",
+                        choices=["prototype", "development", "production", "release"],
+                        help="Quality target for validation (default: development)")
 
     args = parser.parse_args()
 
@@ -457,6 +440,13 @@ Examples:
             generate_core_all(core_dir)
 
         generate_game_assets(args.game, output_dir, asset_type)
+
+        # Validate if requested
+        if args.validate:
+            passed = validate_game_assets(args.game, output_dir, args.quality)
+            if not passed:
+                print("\nValidation FAILED - some assets need improvement")
+                sys.exit(1)
 
     print("\n" + "=" * 60)
     print("Generation complete!")

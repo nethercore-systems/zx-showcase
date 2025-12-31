@@ -10,7 +10,9 @@ use std::path::{Path, PathBuf};
 pub enum AssetStrategy {
     /// Assets generated in build.rs (Override)
     BuildRs,
-    /// Standalone tool must be run first (Prism Survivors)
+    /// Blender + Python pipeline (preferred for all new games)
+    BlenderPipeline,
+    /// Standalone tool must be run first (legacy)
     StandaloneTool { tool_path: PathBuf },
     /// No asset generation - needs procgen or manual creation
     None,
@@ -84,40 +86,38 @@ pub fn discover_games(root: &Path) -> Result<Vec<GameConfig>> {
         });
     }
 
-    // Prism Survivors - has tools/asset-gen/
+    // Prism Survivors - Blender + Python pipeline
     let prism_path = games_dir.join("prism-survivors");
     if prism_path.exists() {
         games.push(GameConfig {
             id: "prism-survivors".to_string(),
             title: "PRISM SURVIVORS".to_string(),
             path: prism_path.clone(),
-            asset_strategy: AssetStrategy::StandaloneTool {
-                tool_path: prism_path.join("tools").join("asset-gen"),
-            },
+            asset_strategy: AssetStrategy::BlenderPipeline,
             nether_toml_path: prism_path.join("nether.toml"),
         });
     }
 
-    // Lumina Depths - no asset generation yet
+    // Lumina Depths - Blender + Python pipeline (metaballs for organics)
     let lumina_path = games_dir.join("lumina-depths");
     if lumina_path.exists() {
         games.push(GameConfig {
             id: "lumina-depths".to_string(),
             title: "LUMINA DEPTHS".to_string(),
             path: lumina_path.clone(),
-            asset_strategy: AssetStrategy::None,
+            asset_strategy: AssetStrategy::BlenderPipeline,
             nether_toml_path: lumina_path.join("nether.toml"),
         });
     }
 
-    // Neon Drift - no asset generation yet
+    // Neon Drift - Blender + Python pipeline
     let neon_path = games_dir.join("neon-drift");
     if neon_path.exists() {
         games.push(GameConfig {
             id: "neon-drift".to_string(),
             title: "NEON DRIFT".to_string(),
             path: neon_path.clone(),
-            asset_strategy: AssetStrategy::None,
+            asset_strategy: AssetStrategy::BlenderPipeline,
             nether_toml_path: neon_path.join("nether.toml"),
         });
     }
@@ -147,7 +147,8 @@ pub fn list_games() -> Result<()> {
 
         let asset_status = match &game.asset_strategy {
             AssetStrategy::BuildRs => "build.rs (auto)".cyan(),
-            AssetStrategy::StandaloneTool { .. } => "standalone tool".yellow(),
+            AssetStrategy::BlenderPipeline => "Blender + Python".green(),
+            AssetStrategy::StandaloneTool { .. } => "standalone tool (legacy)".yellow(),
             AssetStrategy::None => {
                 if has_assets {
                     "manual/procgen".blue()
