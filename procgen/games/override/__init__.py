@@ -2,10 +2,10 @@
 Override - Procedural Asset Generation Module
 
 Generates all assets for the Override game:
-- Tilesets (floor and wall tiles)
-- Sprites (doors, traps, characters)
-- VFX (gas clouds, laser beams, glows)
-- UI elements (energy bars, timers, indicators)
+- Tilesets (floor and wall tiles) - one asset per file in floors/ and walls/
+- Sprites (doors, traps, characters) - one asset per file in doors/, traps/, characters/
+- VFX (gas clouds, laser beams, glows) - one asset per file in effects/
+- UI elements (energy bars, timers, indicators) - one asset per file in ui_elements/
 - Audio (SFX and music)
 
 Usage:
@@ -25,6 +25,52 @@ from .sprites import generate_all_sprites
 from .vfx import generate_all_vfx
 from .ui import generate_all_ui
 from .audio import generate_all_sfx
+
+# Re-export individual generators for direct access
+from .floors import (
+    generate_floor_metal,
+    generate_floor_grate,
+    generate_floor_panel,
+    generate_floor_damaged,
+)
+from .walls import (
+    generate_wall_solid,
+    generate_wall_window,
+    generate_wall_vent,
+    generate_wall_pipe,
+    generate_wall_screen,
+    generate_wall_doorframe,
+)
+from .doors import (
+    generate_door_closed,
+    generate_door_open,
+    generate_door_locked,
+)
+from .traps import (
+    generate_trap_spike,
+    generate_trap_gas,
+    generate_trap_laser,
+)
+from .characters import (
+    generate_runner_idle,
+    generate_drone_idle,
+)
+from .effects import (
+    generate_gas_cloud,
+    generate_laser_beam,
+    generate_core_glow,
+    generate_dust_particle,
+    generate_flash,
+    generate_spark,
+)
+from .ui_elements import (
+    generate_energy_bar_bg,
+    generate_energy_bar_fill,
+    generate_timer_digit,
+    generate_indicator,
+    generate_power_button,
+    generate_button,
+)
 
 
 def generate_all(output_dir: Path, asset_type: str = "all") -> Dict[str, int]:
@@ -74,7 +120,52 @@ def generate_all(output_dir: Path, asset_type: str = "all") -> Dict[str, int]:
 
 
 __all__ = [
+    # Main generator
     "generate_all",
+    # Config
     "STYLE_TOKENS",
     "PALETTE",
+    # Batch generators
+    "generate_all_tilesets",
+    "generate_all_sprites",
+    "generate_all_vfx",
+    "generate_all_ui",
+    "generate_all_sfx",
+    # Floor tiles
+    "generate_floor_metal",
+    "generate_floor_grate",
+    "generate_floor_panel",
+    "generate_floor_damaged",
+    # Wall tiles
+    "generate_wall_solid",
+    "generate_wall_window",
+    "generate_wall_vent",
+    "generate_wall_pipe",
+    "generate_wall_screen",
+    "generate_wall_doorframe",
+    # Doors
+    "generate_door_closed",
+    "generate_door_open",
+    "generate_door_locked",
+    # Traps
+    "generate_trap_spike",
+    "generate_trap_gas",
+    "generate_trap_laser",
+    # Characters
+    "generate_runner_idle",
+    "generate_drone_idle",
+    # Effects
+    "generate_gas_cloud",
+    "generate_laser_beam",
+    "generate_core_glow",
+    "generate_dust_particle",
+    "generate_flash",
+    "generate_spark",
+    # UI Elements
+    "generate_energy_bar_bg",
+    "generate_energy_bar_fill",
+    "generate_timer_digit",
+    "generate_indicator",
+    "generate_power_button",
+    "generate_button",
 ]
