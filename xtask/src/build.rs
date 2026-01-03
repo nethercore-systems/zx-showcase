@@ -1,6 +1,6 @@
 //! Build orchestration for games
 
-use crate::asset_gen::find_blender;
+use crate::asset_gen::find_python;
 use crate::config::{discover_games, AssetStrategy, GameConfig};
 use anyhow::{bail, Context, Result};
 use colored::Colorize;
@@ -63,16 +63,16 @@ pub fn build_all(skip_assets: bool, parallel: bool) -> Result<()> {
     if !skip_assets {
         println!("{}", "Phase 1: Asset Generation".bold());
         println!("{}", "-------------------------".dimmed());
-        let blender = find_blender().ok();
+        let python = find_python().ok();
         for game in &games {
             print!("  {} ... ", game.id);
-            if let Some(ref blender_path) = blender {
-                match crate::asset_gen::generate_for_game(game, blender_path) {
+            if let Some(ref python_path) = python {
+                match crate::asset_gen::generate_for_game(game, python_path) {
                     Ok(_) => println!("{}", "OK".green()),
                     Err(e) => println!("{} - {}", "WARN".yellow(), e),
                 }
             } else {
-                println!("{} - Blender not found", "SKIP".yellow());
+                println!("{} - Python not found", "SKIP".yellow());
             }
         }
         println!();
@@ -163,8 +163,8 @@ pub fn build_game(game_id: &str, skip_assets: bool) -> Result<()> {
 
     if !skip_assets {
         println!("  Generating assets...");
-        let blender = find_blender()?;
-        crate::asset_gen::generate_for_game(game, &blender)?;
+        let python = find_python()?;
+        crate::asset_gen::generate_for_game(game, &python)?;
     }
 
     println!("  Compiling and packing...");

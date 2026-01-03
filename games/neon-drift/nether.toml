@@ -9,295 +9,266 @@ compress_textures = true  # BC compression for VRAM budget
 # === VEHICLES (7) ===
 [[assets.meshes]]
 id = "speedster"
-path = "assets/models/meshes/speedster.glb"
+path = "generated/meshes/speedster.glb"
 
 [[assets.meshes]]
 id = "muscle"
-path = "assets/models/meshes/muscle.glb"
+path = "generated/meshes/muscle.glb"
 
 [[assets.meshes]]
 id = "racer"
-path = "assets/models/meshes/racer.glb"
+path = "generated/meshes/racer.glb"
 
 [[assets.meshes]]
 id = "drift"
-path = "assets/models/meshes/drift.glb"
+path = "generated/meshes/drift.glb"
 
 [[assets.meshes]]
 id = "phantom"
-path = "assets/models/meshes/phantom.glb"
+path = "generated/meshes/phantom.glb"
 
 [[assets.meshes]]
 id = "titan"
-path = "assets/models/meshes/titan.glb"
+path = "generated/meshes/titan.glb"
 
 [[assets.meshes]]
 id = "viper"
-path = "assets/models/meshes/viper.glb"
+path = "generated/meshes/viper.glb"
 
 # === TRACK SEGMENTS (6) ===
 [[assets.meshes]]
 id = "track_straight"
-path = "assets/models/meshes/track_straight.glb"
+path = "generated/meshes/track_straight.glb"
 
 [[assets.meshes]]
 id = "track_curve_left"
-path = "assets/models/meshes/track_curve_left.glb"
+path = "generated/meshes/track_curve_left.glb"
 
 [[assets.meshes]]
 id = "track_curve_right"
-path = "assets/models/meshes/track_curve_right.glb"
+path = "generated/meshes/track_curve_right.glb"
 
 [[assets.meshes]]
 id = "track_tunnel"
-path = "assets/models/meshes/track_tunnel.glb"
+path = "generated/meshes/track_tunnel.glb"
 
 [[assets.meshes]]
 id = "track_jump"
-path = "assets/models/meshes/track_jump.glb"
+path = "generated/meshes/track_jump.glb"
 
 [[assets.meshes]]
 id = "track_checkpoint"
-path = "assets/models/meshes/track_checkpoint.glb"
+path = "generated/meshes/track_checkpoint.glb"
 
 # === PROPS (5) ===
 [[assets.meshes]]
 id = "prop_barrier"
-path = "assets/models/meshes/prop_barrier.glb"
+path = "generated/meshes/prop_barrier.glb"
 
 [[assets.meshes]]
 id = "prop_boost_pad"
-path = "assets/models/meshes/prop_boost_pad.glb"
+path = "generated/meshes/prop_boost_pad.glb"
 
 [[assets.meshes]]
 id = "prop_billboard"
-path = "assets/models/meshes/prop_billboard.glb"
+path = "generated/meshes/prop_billboard.glb"
 
 [[assets.meshes]]
 id = "prop_building"
-path = "assets/models/meshes/prop_building.glb"
+path = "generated/meshes/prop_building.glb"
 
 [[assets.meshes]]
 id = "crystal_formation"
-path = "assets/models/meshes/crystal_formation.glb"
+path = "generated/meshes/crystal_formation.glb"
 
 # === CAR TEXTURES (Albedo) ===
 [[assets.textures]]
 id = "speedster"
-path = "assets/models/textures/speedster.png"
+path = "generated/textures/speedster.png"
 
 [[assets.textures]]
 id = "muscle"
-path = "assets/models/textures/muscle.png"
+path = "generated/textures/muscle.png"
 
 [[assets.textures]]
 id = "racer"
-path = "assets/models/textures/racer.png"
+path = "generated/textures/racer.png"
 
 [[assets.textures]]
 id = "drift"
-path = "assets/models/textures/drift.png"
+path = "generated/textures/drift.png"
 
 [[assets.textures]]
 id = "phantom"
-path = "assets/models/textures/phantom.png"
+path = "generated/textures/phantom.png"
 
 [[assets.textures]]
 id = "titan"
-path = "assets/models/textures/titan.png"
+path = "generated/textures/titan.png"
 
 [[assets.textures]]
 id = "viper"
-path = "assets/models/textures/viper.png"
+path = "generated/textures/viper.png"
 
 # === CAR TEXTURES (Emissive) ===
 [[assets.textures]]
 id = "speedster_emissive"
-path = "assets/models/textures/speedster_emissive.png"
+path = "generated/textures/speedster_emissive.png"
 
 [[assets.textures]]
 id = "muscle_emissive"
-path = "assets/models/textures/muscle_emissive.png"
+path = "generated/textures/muscle_emissive.png"
 
 [[assets.textures]]
 id = "racer_emissive"
-path = "assets/models/textures/racer_emissive.png"
+path = "generated/textures/racer_emissive.png"
 
 [[assets.textures]]
 id = "drift_emissive"
-path = "assets/models/textures/drift_emissive.png"
+path = "generated/textures/drift_emissive.png"
 
 [[assets.textures]]
 id = "phantom_emissive"
-path = "assets/models/textures/phantom_emissive.png"
+path = "generated/textures/phantom_emissive.png"
 
 [[assets.textures]]
 id = "titan_emissive"
-path = "assets/models/textures/titan_emissive.png"
+path = "generated/textures/titan_emissive.png"
 
 [[assets.textures]]
 id = "viper_emissive"
-path = "assets/models/textures/viper_emissive.png"
+path = "generated/textures/viper_emissive.png"
 
 # === TRACK TEXTURES ===
 [[assets.textures]]
 id = "track_straight"
-path = "assets/models/textures/track_straight.png"
+path = "generated/textures/track_straight.png"
 
 [[assets.textures]]
 id = "track_curve_left"
-path = "assets/models/textures/track_curve_left.png"
+path = "generated/textures/track_curve_left.png"
 
 [[assets.textures]]
 id = "track_curve_right"
-path = "assets/models/textures/track_curve_right.png"
+path = "generated/textures/track_curve_right.png"
 
 [[assets.textures]]
 id = "track_tunnel"
-path = "assets/models/textures/track_tunnel.png"
+path = "generated/textures/track_tunnel.png"
 
 [[assets.textures]]
 id = "track_jump"
-path = "assets/models/textures/track_jump.png"
+path = "generated/textures/track_jump.png"
 
 # === PROP TEXTURES (Albedo) ===
 [[assets.textures]]
 id = "prop_barrier"
-path = "assets/models/textures/prop_barrier.png"
+path = "generated/textures/prop_barrier.png"
 
 [[assets.textures]]
 id = "prop_boost_pad"
-path = "assets/models/textures/prop_boost_pad.png"
+path = "generated/textures/prop_boost_pad.png"
 
 [[assets.textures]]
 id = "prop_billboard"
-path = "assets/models/textures/prop_billboard.png"
+path = "generated/textures/prop_billboard.png"
 
 [[assets.textures]]
 id = "prop_building"
-path = "assets/models/textures/prop_building.png"
+path = "generated/textures/prop_building.png"
 
 [[assets.textures]]
 id = "crystal_formation"
-path = "assets/models/textures/crystal_formation.png"
+path = "generated/textures/crystal_formation.png"
 
 # === PROP TEXTURES (Emissive) ===
 [[assets.textures]]
 id = "prop_barrier_emissive"
-path = "assets/models/textures/prop_barrier_emissive.png"
+path = "generated/textures/prop_barrier_emissive.png"
 
 [[assets.textures]]
 id = "prop_boost_pad_emissive"
-path = "assets/models/textures/prop_boost_pad_emissive.png"
+path = "generated/textures/prop_boost_pad_emissive.png"
 
 [[assets.textures]]
 id = "prop_billboard_emissive"
-path = "assets/models/textures/prop_billboard_emissive.png"
+path = "generated/textures/prop_billboard_emissive.png"
 
 [[assets.textures]]
 id = "crystal_formation_emissive"
-path = "assets/models/textures/crystal_formation_emissive.png"
+path = "generated/textures/crystal_formation_emissive.png"
 
 # === UI TEXTURES ===
 [[assets.textures]]
 id = "neon_font"
-path = "assets/models/textures/neon_font.png"
+path = "generated/textures/neon_font.png"
 
 # === SOUND EFFECTS (11) ===
 [[assets.sounds]]
 id = "engine_idle"
-path = "assets/audio/engine_idle.wav"
+path = "generated/sounds/engine_idle.wav"
 
 [[assets.sounds]]
 id = "engine_rev"
-path = "assets/audio/engine_rev.wav"
+path = "generated/sounds/engine_rev.wav"
 
 [[assets.sounds]]
 id = "boost"
-path = "assets/audio/boost.wav"
+path = "generated/sounds/boost.wav"
 
 [[assets.sounds]]
 id = "drift"
-path = "assets/audio/drift.wav"
+path = "generated/sounds/drift.wav"
 
 [[assets.sounds]]
 id = "brake"
-path = "assets/audio/brake.wav"
+path = "generated/sounds/brake.wav"
 
 [[assets.sounds]]
 id = "shift"
-path = "assets/audio/shift.wav"
+path = "generated/sounds/shift.wav"
 
 [[assets.sounds]]
 id = "wall"
-path = "assets/audio/wall.wav"
+path = "generated/sounds/wall.wav"
 
 [[assets.sounds]]
 id = "barrier"
-path = "assets/audio/barrier.wav"
+path = "generated/sounds/barrier.wav"
 
 [[assets.sounds]]
 id = "countdown"
-path = "assets/audio/countdown.wav"
+path = "generated/sounds/countdown.wav"
 
 [[assets.sounds]]
 id = "checkpoint"
-path = "assets/audio/checkpoint.wav"
+path = "generated/sounds/checkpoint.wav"
 
 [[assets.sounds]]
 id = "finish"
-path = "assets/audio/finish.wav"
+path = "generated/sounds/finish.wav"
 
 # === SYNTH SAMPLES (8) ===
-[[assets.sounds]]
-id = "synth_kick"
-path = "assets/audio/synth_kick.wav"
-
-[[assets.sounds]]
-id = "synth_snare"
-path = "assets/audio/synth_snare.wav"
-
-[[assets.sounds]]
-id = "synth_hihat"
-path = "assets/audio/synth_hihat.wav"
-
-[[assets.sounds]]
-id = "synth_openhat"
-path = "assets/audio/synth_openhat.wav"
-
-[[assets.sounds]]
-id = "synth_bass"
-path = "assets/audio/synth_bass.wav"
-
-[[assets.sounds]]
-id = "synth_lead"
-path = "assets/audio/synth_lead.wav"
-
-[[assets.sounds]]
-id = "synth_pad"
-path = "assets/audio/synth_pad.wav"
-
-[[assets.sounds]]
-id = "synth_arp"
-path = "assets/audio/synth_arp.wav"
+# Note: Synth samples are now embedded in XM tracker files
+# They are automatically extracted by the tracker player
 
 # === MUSIC TRACKS (XM Tracker Format) ===
 [[assets.trackers]]
 id = "sunset_strip"
-path = "assets/audio/music/sunset_strip.xm"
+path = "generated/sounds/music/sunset_strip.xm"
 
 [[assets.trackers]]
 id = "neon_city"
-path = "assets/audio/music/neon_city.xm"
+path = "generated/sounds/music/neon_city.xm"
 
 [[assets.trackers]]
 id = "void_tunnel"
-path = "assets/audio/music/void_tunnel.xm"
+path = "generated/sounds/music/void_tunnel.xm"
 
 [[assets.trackers]]
 id = "crystal_cavern"
-path = "assets/audio/music/crystal_cavern.xm"
+path = "generated/sounds/music/crystal_cavern.xm"
 
 [[assets.trackers]]
 id = "solar_highway"
-path = "assets/audio/music/solar_highway.xm"
+path = "generated/sounds/music/solar_highway.xm"

@@ -8,84 +8,84 @@ render_mode = 3  # Mode 3: Specular-Shininess Blinn-Phong
 # === PLAYER ===
 [[assets.meshes]]
 id = "submersible"
-path = "assets/models/meshes/submersible.glb"
+path = "generated/meshes/submersible.glb"
 
 # === ZONE 1: SUNLIT WATERS ===
 [[assets.meshes]]
 id = "reef_fish"
-path = "assets/models/meshes/reef_fish.glb"
+path = "generated/meshes/reef_fish.glb"
 
 [[assets.meshes]]
 id = "sea_turtle"
-path = "assets/models/meshes/sea_turtle.glb"
+path = "generated/meshes/sea_turtle.glb"
 
 [[assets.meshes]]
 id = "manta_ray"
-path = "assets/models/meshes/manta_ray.glb"
+path = "generated/meshes/manta_ray.glb"
 
 [[assets.meshes]]
 id = "coral_crab"
-path = "assets/models/meshes/coral_crab.glb"
+path = "generated/meshes/coral_crab.glb"
 
 # === ZONE 2: TWILIGHT REALM ===
 [[assets.meshes]]
 id = "moon_jelly"
-path = "assets/models/meshes/moon_jelly.glb"
+path = "generated/meshes/moon_jelly.glb"
 
 [[assets.meshes]]
 id = "lanternfish"
-path = "assets/models/meshes/lanternfish.glb"
+path = "generated/meshes/lanternfish.glb"
 
 [[assets.meshes]]
 id = "siphonophore"
-path = "assets/models/meshes/siphonophore.glb"
+path = "generated/meshes/siphonophore.glb"
 
 [[assets.meshes]]
 id = "giant_squid"
-path = "assets/models/meshes/giant_squid.glb"
+path = "generated/meshes/giant_squid.glb"
 
 # === ZONE 3: MIDNIGHT ABYSS ===
 [[assets.meshes]]
 id = "anglerfish"
-path = "assets/models/meshes/anglerfish.glb"
+path = "generated/meshes/anglerfish.glb"
 
 [[assets.meshes]]
 id = "gulper_eel"
-path = "assets/models/meshes/gulper_eel.glb"
+path = "generated/meshes/gulper_eel.glb"
 
 [[assets.meshes]]
 id = "dumbo_octopus"
-path = "assets/models/meshes/dumbo_octopus.glb"
+path = "generated/meshes/dumbo_octopus.glb"
 
 [[assets.meshes]]
 id = "vampire_squid"
-path = "assets/models/meshes/vampire_squid.glb"
+path = "generated/meshes/vampire_squid.glb"
 
 # === ZONE 4: HYDROTHERMAL VENTS ===
 [[assets.meshes]]
 id = "tube_worms"
-path = "assets/models/meshes/tube_worms.glb"
+path = "generated/meshes/tube_worms.glb"
 
 [[assets.meshes]]
 id = "vent_shrimp"
-path = "assets/models/meshes/vent_shrimp.glb"
+path = "generated/meshes/vent_shrimp.glb"
 
 [[assets.meshes]]
 id = "ghost_fish"
-path = "assets/models/meshes/ghost_fish.glb"
+path = "generated/meshes/ghost_fish.glb"
 
 [[assets.meshes]]
 id = "vent_octopus"
-path = "assets/models/meshes/vent_octopus.glb"
+path = "generated/meshes/vent_octopus.glb"
 
 # === EPIC ENCOUNTERS ===
 [[assets.meshes]]
 id = "blue_whale"
-path = "assets/models/meshes/blue_whale.glb"
+path = "generated/meshes/blue_whale.glb"
 
 [[assets.meshes]]
 id = "sperm_whale"
-path = "assets/models/meshes/sperm_whale.glb"
+path = "generated/meshes/sperm_whale.glb"
 
 # Note: Additional assets need to be generated:
 # - Flora: coral_brain, coral_fan, coral_branch, kelp, anemone, sea_grass

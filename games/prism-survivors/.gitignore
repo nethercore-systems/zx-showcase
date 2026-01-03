@@ -1,28 +1,61 @@
-# Generated assets (regenerate with: cargo run -p mesh-gen)
-assets/meshes/*.obj
-assets/meshes/*.gltf
-assets/meshes/*.glb
-assets/textures/*.png
-assets/textures/*.jpg
-assets/audio/*.wav
-assets/audio/*.raw
+# ============================================
+# GENERATED ASSETS - Regenerate from source code
+# ============================================
+# These are procedurally generated and should NOT be committed.
+# Run the generator to recreate them.
 
-# Keep the directories but not the contents
-!assets/meshes/.gitkeep
-!assets/textures/.gitkeep
-!assets/audio/.gitkeep
+# All generated asset formats
+generated/**/*.png
+generated/**/*.jpg
+generated/**/*.obj
+generated/**/*.gltf
+generated/**/*.glb
+generated/**/*.wav
+generated/**/*.ogg
+generated/**/*.xm
 
-# Mesh generator output directory
-tools/mesh-gen/output/
+# Nethercore binary formats
+generated/**/*.nczxmesh
+generated/**/*.nczxtex
+generated/**/*.nczxsnd
+generated/**/*.nczxskel
+generated/**/*.nczxanim
 
-# Build artifacts
-target/
+# Keep directory structure
+!generated/**/
+!generated/**/.gitkeep
+
+# ============================================
+# BUILD OUTPUTS
+# ============================================
+/target/
+*.nczx
 *.wasm
-
-# ROM pack (generated)
 *.rom
 data.pack
 
-# OS files
+# ============================================
+# LANGUAGE-SPECIFIC
+# ============================================
+
+# Rust
+Cargo.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
+
+# ============================================
+# EDITOR & OS
+# ============================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 .DS_Store
 Thumbs.db

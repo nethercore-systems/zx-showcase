@@ -1,7 +1,6 @@
-//! Asset generation using unified Blender + Python pipeline
+//! Asset generation using per-game generation/ directories
 //!
-//! All asset generation uses: blender --background --python run_blender.py -- --game <game> --all
-//! This ensures GLB output, metaball support for organics, and consistent pipeline.
+//! Each game has its own generation/generate_all.py script
 
 use crate::config::{discover_games, AssetStrategy, GameConfig};
 use anyhow::{bail, Context, Result};
@@ -9,7 +8,18 @@ use colored::Colorize;
 use std::path::PathBuf;
 use std::process::Command;
 
-/// Find Blender executable
+/// Find Python executable
+pub fn find_python() -> Result<PathBuf> {
+    // Try python3 first (Unix/macOS), then python (Windows)
+    for cmd in ["python", "python3"] {
+        if let Ok(path) = which::which(cmd) {
+            return Ok(path);
+        }
+    }
+    bail!("Python not found. Install Python 3.8+ and add to PATH.")
+}
+
+/// Find Blender executable (still needed for some generators)
 pub fn find_blender() -> Result<PathBuf> {
     // Try which first
     if let Ok(path) = which::which("blender") {
@@ -18,6 +28,7 @@ pub fn find_blender() -> Result<PathBuf> {
 
     #[cfg(windows)]
     let candidates = [
+        "C:\\Program Files\\Blender Foundation\\Blender 5.0\\blender.exe",
         "C:\\Program Files\\Blender Foundation\\Blender 4.3\\blender.exe",
         "C:\\Program Files\\Blender Foundation\\Blender 4.2\\blender.exe",
         "C:\\Program Files\\Blender Foundation\\Blender 4.1\\blender.exe",
@@ -48,11 +59,17 @@ pub fn find_blender() -> Result<PathBuf> {
 pub fn generate_assets(game_filter: Option<&str>) -> Result<()> {
     let root = crate::project_root();
     let games = discover_games(&root)?;
-    let blender = find_blender()?;
+    let python = find_python()?;
+    let blender_result = find_blender();
 
-    println!("{}", "Asset Generation (Blender + Python)".bold());
-    println!("{}", "====================================".dimmed());
-    println!("Using Blender: {}", blender.display());
+    println!("{}", "Asset Generation (Per-Game)".bold());
+    println!("{}", "===========================".dimmed());
+    println!("Using Python: {}", python.display());
+    if let Ok(blender) = &blender_result {
+        println!("Using Blender: {}", blender.display());
+    } else {
+        println!("{}", "Warning: Blender not found (needed for mesh generation)".yellow());
+    }
     println!();
 
     let mut success_count = 0;
@@ -68,7 +85,7 @@ pub fn generate_assets(game_filter: Option<&str>) -> Result<()> {
 
         print!("  {} ... ", game.id.bold());
 
-        match generate_for_game(game, &blender) {
+        match generate_for_game(game, &python) {
             Ok(GenerateResult::Generated) => {
                 println!("{}", "OK".green());
                 success_count += 1;
@@ -78,7 +95,7 @@ pub fn generate_assets(game_filter: Option<&str>) -> Result<()> {
                 skip_count += 1;
             }
             Ok(GenerateResult::NeedsManual(msg)) => {
-                println!("{}", "NEEDS BLENDER GENERATOR".yellow().bold());
+                println!("{}", "NEEDS SETUP".yellow().bold());
                 println!("      {}", msg.dimmed());
                 skip_count += 1;
             }
@@ -106,7 +123,7 @@ pub enum GenerateResult {
     NeedsManual(String),
 }
 
-pub fn generate_for_game(game: &GameConfig, blender: &PathBuf) -> Result<GenerateResult> {
+pub fn generate_for_game(game: &GameConfig, python: &PathBuf) -> Result<GenerateResult> {
     match &game.asset_strategy {
         AssetStrategy::BuildRs => {
             // build.rs generates assets during cargo build - nothing to do here
@@ -115,59 +132,45 @@ pub fn generate_for_game(game: &GameConfig, blender: &PathBuf) -> Result<Generat
             ))
         }
 
-        AssetStrategy::BlenderPipeline => run_blender_pipeline(game, blender),
+        AssetStrategy::BlenderPipeline => run_game_generator(game, python),
 
-        AssetStrategy::StandaloneTool { .. } => {
-            // Legacy - redirect to Blender pipeline
-            run_blender_pipeline(game, blender)
-        }
+        AssetStrategy::StandaloneTool { .. } => run_game_generator(game, python),
 
         AssetStrategy::None => {
-            // Try Blender pipeline, fall back if not implemented
-            match run_blender_pipeline(game, blender) {
-                Ok(result) => Ok(result),
-                Err(_) => {
-                    if game.has_assets() {
-                        Ok(GenerateResult::Skipped("assets already exist".to_string()))
-                    } else {
-                        Ok(GenerateResult::NeedsManual(
-                            "Add Blender generator in procgen/games/".to_string(),
-                        ))
-                    }
-                }
+            // Check if game has generation/generate_all.py
+            let generate_all = game.path.join("generation").join("generate_all.py");
+            if generate_all.exists() {
+                run_game_generator(game, python)
+            } else if game.has_assets() {
+                Ok(GenerateResult::Skipped("assets already exist".to_string()))
+            } else {
+                Ok(GenerateResult::NeedsManual(
+                    "Add generation/generate_all.py script".to_string(),
+                ))
             }
         }
     }
 }
 
-/// Run the unified Blender + Python asset generation pipeline
-fn run_blender_pipeline(game: &GameConfig, blender: &PathBuf) -> Result<GenerateResult> {
-    let root = crate::project_root();
-    let run_blender_py = root.join("procgen").join("run_blender.py");
+/// Run the game's generation/generate_all.py script
+fn run_game_generator(game: &GameConfig, python: &PathBuf) -> Result<GenerateResult> {
+    let generate_all = game.path.join("generation").join("generate_all.py");
 
-    if !run_blender_py.exists() {
-        bail!("run_blender.py not found at {}", run_blender_py.display());
+    if !generate_all.exists() {
+        return Ok(GenerateResult::NeedsManual(format!(
+            "Game '{}' missing generation/generate_all.py",
+            game.id
+        )));
     }
 
     println!();
-    println!(
-        "      Running: blender --background --python run_blender.py -- --game {} --all",
-        game.id
-    );
+    println!("      Running: python generation/generate_all.py");
 
-    let output = Command::new(blender)
-        .args([
-            "--background",
-            "--python",
-            run_blender_py.to_str().unwrap(),
-            "--",
-            "--game",
-            &game.id,
-            "--all",
-        ])
-        .current_dir(&root)
+    let output = Command::new(python)
+        .arg(generate_all.to_str().unwrap())
+        .current_dir(&game.path)
         .output()
-        .context("Failed to run Blender")?;
+        .context("Failed to run Python generator")?;
 
     let stdout = String::from_utf8_lossy(&output.stdout);
     let stderr = String::from_utf8_lossy(&output.stderr);
@@ -186,13 +189,13 @@ fn run_blender_pipeline(game: &GameConfig, blender: &PathBuf) -> Result<Generate
         // Check if it's a "not implemented" error vs actual failure
         if stderr.contains("not fully implemented") || stdout.contains("not fully implemented") {
             return Ok(GenerateResult::NeedsManual(format!(
-                "Game '{}' Blender generator not yet implemented",
+                "Game '{}' generator not yet implemented",
                 game.id
             )));
         }
 
         bail!(
-            "Blender asset generation failed:\nstdout: {}\nstderr: {}",
+            "Asset generation failed:\nstdout: {}\nstderr: {}",
             stdout,
             stderr
         );

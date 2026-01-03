@@ -2,13 +2,24 @@
 # GENERATED ASSETS - Regenerate from source code
 # ============================================
 # These are procedurally generated and should NOT be committed.
-# Run cargo build to regenerate them.
+# Run the generator to recreate them.
 
 # All generated asset formats
 generated/**/*.png
 generated/**/*.jpg
+generated/**/*.obj
+generated/**/*.gltf
+generated/**/*.glb
 generated/**/*.wav
 generated/**/*.ogg
+generated/**/*.xm
+
+# Nethercore binary formats
+generated/**/*.nczxmesh
+generated/**/*.nczxtex
+generated/**/*.nczxsnd
+generated/**/*.nczxskel
+generated/**/*.nczxanim
 
 # Keep directory structure
 !generated/**/
@@ -26,6 +37,14 @@ generated/**/*.ogg
 
 # Rust
 Cargo.lock
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.egg-info/
 
 # ============================================
 # EDITOR & OS

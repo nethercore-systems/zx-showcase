@@ -49,7 +49,7 @@ pub struct GameMetadata {
 impl GameConfig {
     /// Check if assets exist for this game
     pub fn has_assets(&self) -> bool {
-        let assets_dir = self.path.join("assets");
+        let assets_dir = self.path.join("generated");
         if !assets_dir.exists() {
             return false;
         }
@@ -74,14 +74,14 @@ pub fn discover_games(root: &Path) -> Result<Vec<GameConfig>> {
     let games_dir = root.join("games");
     let mut games = Vec::new();
 
-    // Override - has build.rs asset generation
+    // Override - Blender + Python pipeline (converted from build.rs)
     let override_path = games_dir.join("override");
     if override_path.exists() {
         games.push(GameConfig {
             id: "override".to_string(),
             title: "OVERRIDE".to_string(),
             path: override_path.clone(),
-            asset_strategy: AssetStrategy::BuildRs,
+            asset_strategy: AssetStrategy::BlenderPipeline,
             nether_toml_path: override_path.join("nether.toml"),
         });
     }

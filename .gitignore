@@ -5,15 +5,7 @@ target/
 *.rom
 
 # Generated assets (procgen outputs - regenerate with build)
-assets/
-*.wav
-*.obj
-*.gltf
-*.glb
-*.png
-*.jpg
-*.jpeg
-*.ppm
+generated/
 
 # IDE
 .idea/
