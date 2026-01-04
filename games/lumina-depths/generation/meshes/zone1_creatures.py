@@ -6,12 +6,18 @@ Zone 1: 0-200m depth, bright, colorful reef life
 - sea_turtle: Graceful swimmer with dome shell
 - manta_ray: Majestic flat diamond shape
 - coral_crab: Hard-shelled crustacean
+
+Run with: blender --background --python zone1_creatures.py
 """
 
 import math
-import os
+import sys
+from pathlib import Path
 
-OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "generated", "meshes")
+sys.path.insert(0, str(Path(__file__).parent.parent / "lib"))
+from mesh_utils import generate_and_export
+
+OUTPUT_DIR = Path(__file__).parent.parent.parent / "generated" / "meshes"
 
 
 def generate_ellipsoid(cx, cy, cz, rx, ry, rz, lat_segments=10, lon_segments=14):
@@ -377,25 +383,8 @@ def generate_coral_crab():
     return merge_meshes(meshes)
 
 
-def write_obj(filename, vertices, faces, name):
-    """Write mesh to OBJ file."""
-    with open(filename, 'w') as f:
-        f.write(f"# Lumina Depths - {name}\n")
-        f.write(f"# Zone 1: Sunlit Waters (0-200m)\n")
-        f.write(f"# Vertices: {len(vertices)}\n")
-        f.write(f"# Faces: {len(faces)}\n\n")
-
-        for v in vertices:
-            f.write(f"v {v[0]:.6f} {v[1]:.6f} {v[2]:.6f}\n")
-
-        f.write("\n")
-
-        for face in faces:
-            f.write(f"f {face[0]+1} {face[1]+1} {face[2]+1}\n")
-
-
 def main():
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     creatures = [
         ("reef_fish", generate_reef_fish, "Reef Fish"),
@@ -404,15 +393,16 @@ def main():
         ("coral_crab", generate_coral_crab, "Coral Crab"),
     ]
 
-    for filename, generator, display_name in creatures:
-        print(f"Generating {display_name}...")
-        vertices, faces = generator()
-        output_path = os.path.join(OUTPUT_DIR, f"{filename}.glb")
-        write_obj(output_path, vertices, faces, display_name)
-        print(f"  -> {output_path}")
-        print(f"     Vertices: {len(vertices)}, Faces: {len(faces)}")
+    print("Generating Zone 1: Sunlit Waters creatures...")
+    print("=" * 50)
 
-    print("\nZone 1 creatures complete!")
+    for asset_name, generator, display_name in creatures:
+        print(f"\nGenerating {display_name}...")
+        vertices, faces = generator()
+        generate_and_export(asset_name, vertices, faces)
+
+    print("\n" + "=" * 50)
+    print("Zone 1 creatures complete!")
 
 
 if __name__ == "__main__":

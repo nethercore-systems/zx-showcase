@@ -9,6 +9,13 @@ generated/**/*.png
 generated/**/*.jpg
 generated/**/*.wav
 generated/**/*.ogg
+generated/**/*.glb
+generated/**/*.gltf
+generated/**/*.obj
+generated/**/*.xm
+
+# Plugin-managed local files
+.studio/*.local.md
 
 # Keep directory structure
 !generated/**/

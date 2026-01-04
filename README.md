@@ -4,12 +4,12 @@ Official showcase games for Nethercore ZX, demonstrating what's possible on the 
 
 ## Games
 
-| Game | Description | Players | Asset Status |
-|------|-------------|---------|--------------|
-| [Override](games/override/) | Asymmetric 1v3 multiplayer | 2-4 | Auto-generated (build.rs) |
-| [Prism Survivors](games/prism-survivors/) | Fantasy survival co-op | 1-4 | Tool-generated |
-| [Lumina Depths](games/lumina-depths/) | Meditative underwater exploration | 1 | Needs AI procgen |
-| [Neon Drift](games/neon-drift/) | Arcade racing | 1-4 | Needs AI procgen |
+| Game | Description | Players | Status |
+|------|-------------|---------|--------|
+| [Override](games/override/) | Asymmetric 1v3 multiplayer | 2-4 | Complete |
+| [Prism Survivors](games/prism-survivors/) | Fantasy survival co-op | 1-4 | Active Development |
+| [Lumina Depths](games/lumina-depths/) | Meditative underwater exploration | 1 | Active Development |
+| [Neon Drift](games/neon-drift/) | Arcade racing | 1-4 | Active Development |
 
 ## Quick Start
 
@@ -26,14 +26,15 @@ Official showcase games for Nethercore ZX, demonstrating what's possible on the 
    cargo build -p nether-cli --release
    ```
 
+3. **Python 3.10+** and **Blender 4.0+** (for asset generation):
+   ```bash
+   pip install numpy scipy
+   ```
+
 ### Build All Games
 
 ```bash
-# Clone the repository
-git clone https://github.com/nethercore-systems/zx-showcase
-cd zx-showcase
-
-# Build and install all games
+# Build and install all games (generates assets, compiles, packs, installs)
 cargo xtask build-all
 
 # Games are installed to ~/.nethercore/games/
@@ -50,10 +51,11 @@ nethercore ~/.nethercore/games/override/rom.nczx
 
 | Command | Description |
 |---------|-------------|
-| `cargo xtask build-all` | Build and install all games |
+| `cargo xtask build-all` | Generate assets, build, and install all games |
 | `cargo xtask build <game>` | Build a specific game |
 | `cargo xtask list` | Show games and their status |
-| `cargo xtask gen-assets` | Generate assets only |
+| `cargo xtask gen-assets` | Generate assets only (no build) |
+| `cargo xtask gen-assets <game>` | Generate assets for specific game |
 | `cargo xtask install` | Install pre-built games |
 | `cargo xtask clean` | Clean build artifacts |
 | `cargo xtask clean --assets` | Clean including generated assets |
@@ -65,27 +67,34 @@ nethercore ~/.nethercore/games/override/rom.nczx
 
 ## Asset Generation
 
-Each game has a different asset generation strategy:
+All games use procedural asset generation with Python + Blender:
 
-### Override (Automatic)
-Assets are generated automatically during `cargo build` via `build.rs`. No manual steps needed.
-
-### Prism Survivors (Tool)
-Has a standalone asset generator:
-```bash
-cd games/prism-survivors/tools/asset-gen
-cargo run --release
 ```
-The xtask runs this automatically.
+games/{game}/
+├── generation/              # Source generators
+│   ├── generate_all.py      # Batch runner (called by xtask)
+│   ├── lib/                 # Game-specific utilities
+│   ├── meshes/              # ONE .py per mesh asset
+│   ├── textures/            # ONE .py per texture
+│   └── sounds/              # ONE .py per sound
+└── generated/               # OUTPUT (gitignored)
+    ├── meshes/              # .glb files
+    ├── textures/            # .png files
+    └── sounds/              # .wav files
+```
 
-### Lumina Depths & Neon Drift (AI Procgen)
-These games need assets generated using the nethercore-ai-plugins:
+### Manual Asset Generation
 
-1. Install the plugins in Claude Code
-2. Use `/generate-asset` for each asset defined in `nether.toml`
-3. Assets will be created in the game's `assets/` directory
+```bash
+# Generate all assets for a game
+cd games/lumina-depths/generation && python generate_all.py
 
-See the [nethercore-ai-plugins](https://github.com/nethercore-systems/nethercore-ai-plugins) for details.
+# Generate single mesh (requires Blender)
+blender --background --python games/neon-drift/generation/meshes/viper.py
+
+# Generate single sound (pure Python)
+python games/override/generation/sounds/alarm.py
+```
 
 ## Project Structure
 

@@ -2,129 +2,145 @@
 
 ## Overview
 
-This repository contains four showcase games for the Nethercore ZX console, all using a shared procedural asset generation pipeline.
+This repository contains four showcase games for the Nethercore ZX console, all using procedural asset generation with Python + Blender.
 
 | Game | Genre | Status | Directory |
 |------|-------|--------|-----------|
 | **Neon Drift** | Arcade Racing | Active Development | `games/neon-drift/` |
-| **Lumina Depths** | Underwater Exploration | Early Development | `games/lumina-depths/` |
+| **Lumina Depths** | Underwater Exploration | Active Development | `games/lumina-depths/` |
 | **Prism Survivors** | Survivors-like | Active Development | `games/prism-survivors/` |
-| **Override** | Asymmetric Multiplayer (1v3) | Design Complete | `games/override/` |
+| **Override** | Asymmetric Multiplayer (1v3) | Complete | `games/override/` |
 
 ## Repository Structure
 
 ```
 zx-showcase/
 ├── CLAUDE.md                    # This file
+├── README.md                    # Public documentation
+├── xtask/                       # Build orchestration (cargo xtask)
 ├── games/
-│   ├── neon-drift/              # Neon racing game
-│   │   ├── src/                 # Rust game code
-│   │   ├── assets/              # Generated assets (GLB, PNG)
-│   │   └── DESIGN_NOTES.md      # Game-specific design
-│   ├── lumina-depths/           # Underwater exploration
-│   │   ├── src/
-│   │   └── assets/
-│   ├── prism-survivors/         # Survivors-like
-│   │   ├── src/
-│   │   ├── assets/
-│   │   └── docs/GDD.md          # Game Design Document
-│   └── override/                # Asymmetric multiplayer (1v3)
-│       ├── src/
-│       ├── assets/
-│       └── docs/design/         # GDD and design docs
-├── procgen/                     # SHARED procedural asset pipeline
-│   ├── core/                    # Universal generation systems
-│   │   ├── base_params.py       # UniversalStyleParams dataclass
-│   │   ├── geometry.py          # Mesh primitives (box, sphere, prism)
-│   │   ├── materials.py         # Blender material node builders
-│   │   └── export.py            # ZX-optimized GLB export
-│   ├── textures/                # Procedural texture generators
-│   │   ├── noise_patterns.py    # Voronoi, perlin, cellular
-│   │   ├── glow_effects.py      # Bioluminescence, neon, prismatic
-│   │   └── pbr_textures.py      # Albedo, roughness, emission maps
-│   ├── meshes/                  # Procedural mesh generators
-│   │   ├── humanoid.py          # Character/enemy base meshes
-│   │   ├── vehicles.py          # Car mesh generation
-│   │   ├── creatures.py         # Organic forms (jellyfish, fish)
-│   │   ├── crystals.py          # Faceted geometric forms
-│   │   └── environment.py       # Props, barriers, buildings
-│   ├── audio/                   # Procedural audio (pyo synthesis)
-│   │   ├── synth_engine.py      # Waveform generation
-│   │   ├── sfx_recipes.py       # JSON-based SFX definitions
-│   │   └── music_generator.py   # Adaptive music layers
-│   └── configs/                 # Per-game style tokens
-│       ├── neon_drift.py        # Neon synthwave aesthetic
-│       ├── lumina_depths.py     # Underwater bioluminescence
-│       ├── prism_survivors.py   # Prismatic crystal aesthetic
-│       └── override.py          # Dark sci-fi industrial aesthetic
-├── creative-direction/          # Art/Sound direction docs
-│   ├── neon-drift.md
-│   ├── lumina-depths.md
-│   ├── prism-survivors.md
-│   └── override.md
+│   └── {game}/                  # Each game follows this structure
+│       ├── src/                 # Rust game code
+│       ├── generated/           # OUTPUT: Generated assets (gitignored)
+│       │   ├── meshes/          # .glb files
+│       │   ├── textures/        # .png files
+│       │   └── sounds/          # .wav files
+│       ├── generation/          # Procedural generators
+│       │   ├── generate_all.py  # Batch runner
+│       │   ├── lib/             # Game-specific utilities
+│       │   ├── meshes/          # ONE .py per mesh asset
+│       │   ├── textures/        # ONE .py per texture
+│       │   └── sounds/          # ONE .py per sound
+│       ├── .studio/             # Plugin-managed project files
+│       │   ├── project-status.md
+│       │   ├── creative-direction.local.md
+│       │   ├── characters/      # Asset specifications
+│       │   ├── music/           # Music specifications
+│       │   └── sfx/             # SFX specifications
+│       ├── docs/                # Game documentation
+│       │   └── GDD.md
+│       └── nether.toml          # Asset manifest
 └── .github/workflows/
     └── build.yml                # CI/CD for all games
 ```
 
-## Procedural Asset Pipeline
+## Build System
 
-### Core Concept
+### Primary Command
 
-All three games share the same Python/Blender procedural generation codebase, but each game provides its own **style tokens** that parameterize the output:
-
-```python
-# Example: Same generator, different output
-from procgen.meshes.humanoid import generate_humanoid
-from procgen.configs import neon_drift, lumina_depths, prism_survivors
-
-# Generates a neon-glowing racer character
-racer = generate_humanoid(neon_drift.STYLE_TOKENS)
-
-# Generates a bioluminescent diver character
-diver = generate_humanoid(lumina_depths.STYLE_TOKENS)
-
-# Generates a crystalline hero character
-hero = generate_humanoid(prism_survivors.STYLE_TOKENS)
+```bash
+# Build everything (generates assets, compiles, packs, installs all 4 games)
+cargo xtask build-all
 ```
 
-### Style Token System
+This single command:
+1. **Phase 1**: Runs `python generate_all.py` for each game (Blender + Python)
+2. **Phase 2**: Runs `nether build` for each game (Rust → WASM → ROM)
+3. **Phase 3**: Installs ROMs to `~/.nethercore/games/`
 
-Each game defines a `STYLE_TOKENS` dict that configures:
+### Other Commands
 
+```bash
+cargo xtask list              # Show games and asset status
+cargo xtask build <game>      # Build single game
+cargo xtask gen-assets        # Generate assets only (no build)
+cargo xtask clean             # Clean build artifacts
+cargo xtask clean --assets    # Also clean generated/ folders
+```
+
+## Asset Generation
+
+### Per-Asset Generator Pattern
+
+Each asset has its own dedicated generator file. Meshes use Blender, sounds use numpy/scipy:
+
+**Mesh generator (requires Blender):**
 ```python
-STYLE_TOKENS = {
-    # Colors
-    "palette": ["#FF00FF", "#00FFFF", ...],
-    "saturation_range": (0.6, 1.0),
-    "color_temperature": -0.4,  # -1 (cool) to 1 (warm)
+#!/usr/bin/env python3
+"""Generate {asset_name} mesh.
 
-    # Geometry
-    "poly_budget": {"small": 200, "medium": 500, "large": 1000},
-    "curvature_bias": 0.75,  # 0 (angular) to 1 (smooth)
-    "symmetry_mode": "bilateral",  # none, bilateral, radial
+Output: ../../generated/meshes/{asset_name}.glb
+Run with: blender --background --python {asset_name}.py
+"""
+import sys
+from pathlib import Path
 
-    # Materials
-    "emissive_enabled": True,
-    "emissive_strength": (0.5, 2.0),
-    "roughness_range": (0.3, 0.8),
+sys.path.insert(0, str(Path(__file__).parent.parent / "lib"))
+from mesh_utils import generate_and_export, merge_meshes, generate_ellipsoid
 
-    # Effects
-    "bloom_intensity": 2.0,
-    "trail_decay": 0.15,
-}
+ASSET_NAME = "{asset_name}"
+
+def generate():
+    meshes = []
+    # Build geometry using helper functions
+    body_v, body_f = generate_ellipsoid(0, 0, 0, 1.0, 0.5, 0.5)
+    meshes.append((body_v, body_f))
+
+    vertices, faces = merge_meshes(meshes)
+    generate_and_export(ASSET_NAME, vertices, faces)
+
+if __name__ == "__main__":
+    generate()
+```
+
+**Sound generator (pure Python):**
+```python
+#!/usr/bin/env python3
+"""Generate {sound_name} sound.
+
+Output: ../../generated/sounds/{sound_name}.wav
+"""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent / "lib"))
+from audio_utils import write_wav, sine_wave, apply_envelope
+
+OUTPUT_DIR = Path(__file__).parent.parent.parent / "generated" / "sounds"
+ASSET_NAME = "{sound_name}"
+
+def generate():
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    # Generate audio samples
+    samples = sine_wave(440, 1.0, 44100)
+    samples = apply_envelope(samples, attack=0.1, release=0.3)
+    write_wav(OUTPUT_DIR / f"{ASSET_NAME}.wav", samples, 44100)
+
+if __name__ == "__main__":
+    generate()
 ```
 
 ### Running Generators
 
 ```bash
-# Generate all Neon Drift assets
-python procgen/run.py --game neon-drift --all
+# Generate all assets for a game (xtask does this automatically)
+cd games/neon-drift/generation && python generate_all.py
 
-# Generate single asset
-python procgen/run.py --game prism-survivors --asset hero_knight
+# Generate single mesh (requires Blender in PATH)
+blender --background --python games/override/generation/meshes/runner.py
 
-# Preview in Blender (opens GUI)
-python procgen/run.py --game lumina-depths --asset jellyfish --preview
+# Generate single sound (pure Python)
+python games/lumina-depths/generation/sounds/whale.py
 ```
 
 ## Game-Specific Notes
@@ -136,7 +152,7 @@ python procgen/run.py --game lumina-depths --asset jellyfish --preview
 
 ### Lumina Depths
 - **Aesthetic**: Underwater bioluminescence, alien beauty
-- **Key Assets**: Creatures (jellyfish, fish), coral, ruins
+- **Key Assets**: Creatures (16 species across 4 depth zones), whales, submersible
 - **Audio**: Ambient drones, subaquatic muffled sounds, ethereal melodies
 
 ### Prism Survivors
@@ -146,38 +162,28 @@ python procgen/run.py --game lumina-depths --asset jellyfish --preview
 
 ### Override
 - **Aesthetic**: Dark sci-fi industrial, high contrast, muted grays/blues
-- **Key Assets**: Runners, drones, tilesets (floors, walls, doors), traps (spike, gas, laser)
-- **Audio**: Industrial tension, ambient machinery, trap activations, adaptive chase music
-- **Gameplay**: 1v3 asymmetric - Overseer controls facility (god-view) vs 3 Runners (chase-cam) collecting data cores
+- **Key Assets**: Runners, drones, tilesets (floors, walls, doors), traps
+- **Audio**: Industrial tension, ambient machinery, trap activations
+- **Gameplay**: 1v3 asymmetric - Overseer controls facility vs 3 Runners
 
 ## Development Commands
 
-### Build Games
+### Quick Reference
 ```bash
-# Build all games
-cd games/neon-drift && cargo build --release
-cd games/lumina-depths && cargo build --release
-cd games/prism-survivors && cargo build --release
-cd games/override && cargo build --release
-```
+# Build everything
+cargo xtask build-all
 
-### Generate Assets
-```bash
-# Requires Python 3.10+ and Blender 3.6+
-pip install -r procgen/requirements.txt
+# Build single game
+cargo xtask build override
 
-# Generate for specific game
-python procgen/run.py --game neon-drift
-```
+# Generate assets only
+cargo xtask gen-assets lumina-depths
 
-### Run Tests
-```bash
-# Game tests
+# Check status
+cargo xtask list
+
+# Run game tests
 cd games/prism-survivors && cargo test
-cd games/override && cargo test
-
-# Asset validation
-python procgen/validate.py --game all
 ```
 
 ## Asset Budgets (ZX Console)
@@ -206,13 +212,6 @@ Assets are referenced via ROM handles:
 let mesh = rom_mesh(b"hero_knight");
 let texture = rom_texture(b"hero_knight_albedo");
 ```
-
-## Contributing
-
-1. Run existing generators before modifying shared pipeline
-2. Update game-specific style tokens if changing aesthetics
-3. Validate poly/texture budgets with `procgen/validate.py`
-4. Test assets in-game before committing
 
 ## Related Repositories
 
