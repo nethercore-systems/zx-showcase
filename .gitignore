@@ -4,8 +4,6 @@ target/
 *.nczx
 *.rom
 
-# Generated assets (procgen outputs - regenerate with build)
-generated/
 
 # IDE
 .idea/
